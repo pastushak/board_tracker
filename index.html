@@ -2,236 +2,267 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Трекер дошки — перегляд</title>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600&family=Geologica:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>board-tracker / view</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;
-  --border:#e2e0d8;--text:#1a1916;--text2:#6b6960;--text3:#9e9c94;
-  --accent:#2d5a3d;--accent-light:#e8f2eb;
-  --danger:#8b2020;--danger-light:#fdf0f0;
-  --warn:#7a4a0a;--warn-light:#fdf5e8;
-  --blue:#1a3f6b;
-  --radius:10px;--radius-sm:6px;
+/* ── DARK (default) ── */
+:root{
+  --bg:#0d0f11;--bg2:#141618;--bg3:#1a1d21;--bg4:#22262b;
+  --border:#2a2f35;--border2:#363c44;
+  --text:#e8eaed;--text2:#8b949e;--text3:#484f58;
+  --accent:#d97706;--accent-dim:#92400e;--accent-light:rgba(217,119,6,.12);
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--yellow:#eab308;
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--r:6px;
+}
+/* ── LIGHT ── */
+[data-theme="light"]{
+  --bg:#f8f7f4;--bg2:#ffffff;--bg3:#f1f0ec;--bg4:#e8e6e1;
+  --border:#e0ddd6;--border2:#ccc9c0;
+  --text:#1a1916;--text2:#6b6960;--text3:#aaa89f;
+  --accent:#b45309;--accent-dim:#d97706;--accent-light:rgba(180,83,9,.1);
+  --green:#15803d;--red:#b91c1c;--blue:#1d4ed8;--yellow:#92400e;
+}
+/* ── MIX ── */
+[data-theme="mix"]{
+  --bg:#0d0f11;--bg2:#ffffff;--bg3:#f1f0ec;--bg4:#e8e6e1;
+  --border:#e0ddd6;--border2:#ccc9c0;
+  --text:#1a1916;--text2:#6b6960;--text3:#aaa89f;
+  --accent:#d97706;--accent-dim:#92400e;--accent-light:rgba(217,119,6,.12);
+  --green:#15803d;--red:#b91c1c;--blue:#1d4ed8;--yellow:#92400e;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+html{font-size:14px;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.topbar-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:500;flex:1;}
-.view-badge{background:var(--blue-light,#eaf0f8);color:var(--blue);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:500;}
-.today-date{font-size:12px;color:var(--text3);}
-.edit-link{font-size:12px;color:var(--accent);text-decoration:none;padding:5px 12px;border:1px solid var(--accent);border-radius:var(--radius-sm);}
-.edit-link:hover{background:var(--accent-light);}
+/* TOPBAR */
+.topbar{display:flex;align-items:center;gap:10px;padding:0 16px;height:48px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;flex-wrap:wrap;}
+.brand{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;}
+.sep{color:var(--border2);font-family:var(--mono);}
+.mode-pill{font-family:var(--mono);font-size:10px;background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.3);border-radius:20px;padding:2px 10px;}
+.top-date{font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:auto;}
+.edit-link{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;border:1px solid var(--accent-dim);border-radius:var(--r);padding:4px 10px;background:var(--accent-light);transition:opacity .15s;}
+.edit-link:hover{opacity:.8;}
+.theme-toggle{display:flex;gap:2px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:2px;flex-shrink:0;}
+.tt-btn{font-family:var(--mono);font-size:10px;padding:3px 8px;border:none;border-radius:4px;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;}
+.tt-btn.on{background:var(--accent);color:#000;font-weight:600;}
+.tt-btn:not(.on):hover{color:var(--text2);}
 
-.stats-row{display:flex;gap:10px;flex-wrap:wrap;padding:16px 24px;background:var(--surface);border-bottom:1px solid var(--border);}
-.stat-card{flex:1;min-width:88px;background:var(--surface2);border-radius:var(--radius);padding:10px 14px;border:1px solid var(--border);}
-.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
-.stat-val{font-size:20px;font-weight:500;font-family:'Unbounded',sans-serif;}
-.stat-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+/* STATS */
+.stats-strip{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);overflow-x:auto;}
+.scard{flex:1;min-width:80px;padding:10px 14px;background:var(--bg2);}
+.scard-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.scard-val{font-family:var(--mono);font-size:18px;font-weight:600;}
 
-.class-tabs{display:flex;gap:6px;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;}
-.class-tab{padding:5px 14px;border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;background:transparent;font-family:'Geologica',sans-serif;color:var(--text2);transition:all .15s;}
-.class-tab:hover{background:var(--surface2);}
-.class-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+/* CLASS TABS */
+.tabs{display:flex;gap:6px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;flex-wrap:wrap;}
+.tab{font-family:var(--mono);font-size:11px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.tab:hover{border-color:var(--border2);color:var(--text);}
+.tab.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
 
-.content{padding:20px 24px;}
+/* CONTENT */
+.content{padding:16px;padding-bottom:24px;}
 
-.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);}
-.ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+.li{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;color:var(--text3);}
+.ld{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
-.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);}
-table{width:100%;border-collapse:collapse;}
-thead{background:var(--surface2);}
-th{padding:9px 10px;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;min-width:480px;}
+thead{background:var(--bg3);}
+th{padding:8px 10px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
 td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px;}
 tr:last-child td{border-bottom:none;}
-tbody tr:hover td{background:#fafaf7;}
-.num-cell{width:28px;color:var(--text3);font-size:12px;}
-.name-cell{font-weight:400;min-width:130px;}
-.name-missing{color:var(--text3);text-decoration:line-through;}
+tbody tr:hover td{background:rgba(255,255,255,.02);}
+.nc{width:28px;font-family:var(--mono);font-size:11px;color:var(--text3);}
 
-.visit-cell{text-align:center;min-width:52px;}
-.visit-pct{display:inline-block;padding:2px 8px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;background:var(--surface2);color:var(--text2);}
-.visit-pct.filled{background:#f0faf3;color:#1e5a2a;border:1px solid #b2ddb8;}
-.visit-date-sm{font-size:10px;color:var(--text3);display:block;margin-top:1px;}
-.empty-visit{color:var(--text3);font-size:12px;}
+.name-text{font-size:13px;}
+.name-absent{color:var(--text3);text-decoration:line-through;}
+.spill{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:4px;margin-top:3px;}
+.spill-ab{background:rgba(234,179,8,.1);color:var(--yellow);}
+.spill-nr{background:rgba(239,68,68,.1);color:var(--red);}
 
-.avg-cell{text-align:right;color:var(--text2);font-size:13px;}
-.grade-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:26px;border-radius:var(--radius-sm);font-family:'Unbounded',sans-serif;font-size:13px;font-weight:500;}
-.g-high{background:#eaf5ee;color:#1e5a2a;}
-.g-good{background:#eaf0f8;color:#1a3f6b;}
-.g-mid{background:#fdf5e8;color:#7a4a0a;}
-.g-low{background:#fdf0f0;color:#8b2020;}
-.g-none{background:var(--surface2);color:var(--text3);}
+.vcell{text-align:center;min-width:54px;}
+.vpct{display:inline-block;font-family:var(--mono);font-size:12px;font-weight:500;padding:2px 7px;border-radius:var(--r);background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+.vdt{font-family:var(--mono);font-size:9px;color:var(--text3);display:block;margin-top:2px;}
+.vempty{font-family:var(--mono);font-size:12px;color:var(--text3);}
 
-.status-pill{display:inline-block;font-size:10px;padding:1px 7px;border-radius:10px;margin-top:3px;}
-.pill-absent{background:var(--warn-light);color:var(--warn);}
-.pill-notready{background:var(--danger-light);color:var(--danger);}
+.avg-td{font-family:var(--mono);font-size:12px;color:var(--text2);text-align:right;white-space:nowrap;}
+.gb{display:inline-flex;align-items:center;justify-content:center;width:32px;height:26px;border-radius:var(--r);font-family:var(--mono);font-size:13px;font-weight:600;}
+.gh{background:rgba(34,197,94,.15);color:var(--green);}
+.gg{background:rgba(59,130,246,.15);color:var(--blue);}
+.gm{background:rgba(234,179,8,.15);color:var(--yellow);}
+.gl{background:rgba(239,68,68,.15);color:var(--red);}
+.gn{background:var(--bg3);color:var(--text3);}
 
-.comment-icon{font-size:13px;cursor:default;}
+.no-data{text-align:center;padding:48px 16px;color:var(--text3);}
+.no-data-title{font-family:var(--mono);font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text2);}
+.no-data-sub{font-family:var(--mono);font-size:12px;}
+.no-data a{color:var(--accent);text-decoration:none;}
 
-.no-data{text-align:center;padding:3rem;color:var(--text3);}
-.no-data-title{font-family:'Unbounded',sans-serif;font-size:15px;margin-bottom:8px;}
-.no-data-sub{font-size:13px;}
+.refresh-note{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:right;margin-top:10px;}
 
-.refresh-hint{font-size:11px;color:var(--text3);text-align:right;margin-top:10px;}
+@media(max-width:600px){
+  .topbar{height:auto;padding:8px 12px;}
+  .top-date{display:none;}
+  .content{padding:12px;}
+}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="topbar-title">Трекер виходів до дошки</div>
-  <span class="today-date" id="todayDate"></span>
-  <span class="view-badge">Режим перегляду</span>
-  <a href="edit.html" class="edit-link">Редагувати →</a>
+  <span class="brand">board-tracker</span>
+  <span class="sep">/</span>
+  <span style="font-family:var(--mono);font-size:12px;color:var(--text2)" id="topClass">—</span>
+  <span class="mode-pill">view</span>
+  <span class="top-date" id="topDate"></span>
+  <a href="edit.html" class="edit-link">edit →</a>
+  <div class="theme-toggle">
+    <button class="tt-btn on" id="tt-dark"  onclick="setTheme('dark')">dark</button>
+    <button class="tt-btn"    id="tt-light" onclick="setTheme('light')">light</button>
+    <button class="tt-btn"    id="tt-mix"   onclick="setTheme('mix')">mix</button>
+  </div>
 </div>
 
-<div class="stats-row" id="statsRow">
-  <div class="stat-card"><div class="stat-label">Учнів</div><div class="stat-val" id="st-total">—</div><div class="stat-sub">у списку</div></div>
-  <div class="stat-card"><div class="stat-label">Оцінено</div><div class="stat-val" id="st-graded">—</div><div class="stat-sub">мають оцінку</div></div>
-  <div class="stat-card"><div class="stat-label">Сер. оцінка</div><div class="stat-val" id="st-avg">—</div><div class="stat-sub">1–12 шкала</div></div>
-  <div class="stat-card"><div class="stat-label">Якість ≥7</div><div class="stat-val" id="st-quality">—</div><div class="stat-sub">достатній рівень</div></div>
-  <div class="stat-card"><div class="stat-label">Ще не виходили</div><div class="stat-val" id="st-never">—</div><div class="stat-sub">учнів</div></div>
+<div class="stats-strip">
+  <div class="scard"><div class="scard-label">Учнів</div><div class="scard-val" id="st-total">—</div></div>
+  <div class="scard"><div class="scard-label">Оцінено</div><div class="scard-val" id="st-graded">—</div></div>
+  <div class="scard"><div class="scard-label">Сер. оцінка</div><div class="scard-val" id="st-avg">—</div></div>
+  <div class="scard"><div class="scard-label">Якість ≥7</div><div class="scard-val" id="st-quality">—</div></div>
+  <div class="scard"><div class="scard-label">Не виходили</div><div class="scard-val" id="st-never">—</div></div>
 </div>
 
-<div class="class-tabs" id="classTabs"></div>
+<div class="tabs" id="tabs"></div>
 
 <div class="content">
   <div class="legend">
-    <div class="legend-item"><div class="ldot" style="background:#7ab98a"></div> Є результат</div>
-    <div class="legend-item"><div class="ldot" style="background:#c0392b"></div> 1–3</div>
-    <div class="legend-item"><div class="ldot" style="background:#d68910"></div> 4–6</div>
-    <div class="legend-item"><div class="ldot" style="background:#1a5276"></div> 7–9</div>
-    <div class="legend-item"><div class="ldot" style="background:#1e5a2a"></div> 10–12</div>
+    <div class="li"><div class="ld" style="background:var(--green)"></div> є результат</div>
+    <div class="li"><div class="ld" style="background:var(--red)"></div> 1–3</div>
+    <div class="li"><div class="ld" style="background:var(--yellow)"></div> 4–6</div>
+    <div class="li"><div class="ld" style="background:var(--blue)"></div> 7–9</div>
+    <div class="li"><div class="ld" style="background:var(--green)"></div> 10–12</div>
   </div>
-
-  <div id="tableContainer"></div>
-  <div class="refresh-hint">Дані оновлюються автоматично кожні 30 секунд</div>
+  <div id="tblContainer"></div>
+  <div class="refresh-note" id="refreshNote"></div>
 </div>
 
 <script>
-const GRADE_SCALE=[[90,12],[83,11],[75,10],[67,9],[59,8],[50,7],[42,6],[34,5],[26,4],[17,3],[8,2],[0,1]];
-function pctToGrade(p){for(const[min,g]of GRADE_SCALE)if(p>=min)return g;return 1;}
-function gradeStyle(g){if(g===null)return 'g-none';if(g>=10)return 'g-high';if(g>=7)return 'g-good';if(g>=4)return 'g-mid';return 'g-low';}
-function todayStr(){return new Date().toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});}
+const GS=[[90,12],[83,11],[75,10],[67,9],[59,8],[50,7],[42,6],[34,5],[26,4],[17,3],[8,2],[0,1]];
+const p2g=p=>{for(const[m,g]of GS)if(p>=m)return g;return 1;};
+const gCls=g=>{if(g===null)return 'gn';if(g>=10)return 'gh';if(g>=7)return 'gg';if(g>=4)return 'gm';return 'gl';};
+const todayStr=()=>new Date().toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});
+const todayISO=()=>new Date().toISOString().slice(0,10);
 
-let db={}, currentClass='';
+let db={},cc='';
 
 function loadData(){
-  try{
-    const raw=localStorage.getItem('boardTracker_v2');
-    if(raw){const d=JSON.parse(raw);db=d.db||{};currentClass=d.currentClass||'';}
-  }catch(e){}
+  try{const r=localStorage.getItem('boardTracker_v2');if(r){const d=JSON.parse(r);db=d.db||{};cc=d.currentClass||'';}}catch(e){}
   if(!Object.keys(db).length)return false;
-  if(!currentClass||!db[currentClass])currentClass=Object.keys(db)[0];
+  if(!cc||!db[cc])cc=Object.keys(db)[0];
   return true;
 }
 
 function renderTabs(){
-  const tabs=document.getElementById('classTabs');
-  tabs.innerHTML=Object.keys(db).map(c=>
-    `<button class="class-tab${c===currentClass?' active':''}" onclick="switchClass('${c}')">${c}</button>`
+  document.getElementById('tabs').innerHTML=Object.keys(db).map(c=>
+    `<button class="tab${c===cc?' on':''}" onclick="switchClass('${c}')">${c}</button>`
   ).join('');
 }
 
-function switchClass(c){currentClass=c;renderTabs();renderTable();renderStats();}
+function switchClass(c){cc=c;renderTabs();renderTable();renderStats();}
 
 function renderStats(){
-  const students=db[currentClass].students;
-  const active=students.filter(s=>s.status!=='absent');
-  const graded=active.filter(s=>s.visits.some(v=>v!==null));
-  const grades=graded.map(s=>{const f=s.visits.filter(v=>v!==null);return pctToGrade(Math.round(f.reduce((a,b)=>a+b,0)/f.length));});
-  const avgGrade=grades.length?(grades.reduce((a,b)=>a+b,0)/grades.length).toFixed(1):'—';
-  const quality=grades.length?Math.round(grades.filter(g=>g>=7).length/grades.length*100)+'%':'—';
-  const neverOut=active.filter(s=>s.visits.every(v=>v===null)&&s.status!=='notready').length;
-  document.getElementById('st-total').textContent=students.length;
-  document.getElementById('st-graded').textContent=graded.length;
-  document.getElementById('st-avg').textContent=avgGrade;
-  document.getElementById('st-quality').textContent=quality;
-  document.getElementById('st-never').textContent=neverOut;
+  const sts=db[cc].students;
+  const act=sts.filter(s=>s.status!=='absent');
+  const gr=act.filter(s=>s.visits.some(v=>v!==null));
+  const gs=gr.map(s=>{const f=s.visits.filter(v=>v!==null);return p2g(Math.round(f.reduce((a,b)=>a+b,0)/f.length));});
+  const avg=gs.length?(gs.reduce((a,b)=>a+b,0)/gs.length).toFixed(1):'—';
+  const qual=gs.length?Math.round(gs.filter(g=>g>=7).length/gs.length*100)+'%':'—';
+  const nev=act.filter(s=>s.visits.every(v=>v===null)&&s.status!=='notready').length;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('st-total',sts.length);set('st-graded',gr.length);set('st-avg',avg);set('st-quality',qual);set('st-never',nev);
+  document.getElementById('topClass').textContent=cc;
 }
 
 function renderTable(){
-  const container=document.getElementById('tableContainer');
-  const students=db[currentClass].students;
-  if(!students.length){
-    container.innerHTML=`<div class="no-data"><div class="no-data-title">Список порожній</div><div class="no-data-sub">Учні ще не додані</div></div>`;
-    return;
-  }
-  const rows=students.map((s,idx)=>{
-    const filled=s.visits.filter(v=>v!==null);
-    const avg=filled.length?Math.round(filled.reduce((a,b)=>a+b,0)/filled.length):null;
-    const grade=avg!==null?pctToGrade(avg):null;
-    const gc=gradeStyle(grade);
-    const absent=s.status==='absent',notready=s.status==='notready';
+  const c=document.getElementById('tblContainer');
+  const sts=db[cc].students;
+  if(!sts.length){c.innerHTML=`<div class="no-data"><div class="no-data-title">// список порожній</div><div class="no-data-sub">учні ще не додані</div></div>`;return;}
 
-    const visitCols=[0,1,2,3].map(i=>{
-      if(s.visits[i]===null) return `<td class="visit-cell"><span class="empty-visit">—</span></td>`;
-      const date=s.visitDates&&s.visitDates[i]?new Date(s.visitDates[i]).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'}):'';
-      return `<td class="visit-cell">
-        <span class="visit-pct filled">${s.visits[i]}%</span>
-        ${date?`<span class="visit-date-sm">${date}</span>`:''}
-      </td>`;
+  const rows=sts.map((s,i)=>{
+    const f=s.visits.filter(v=>v!==null);
+    const avg=f.length?Math.round(f.reduce((a,b)=>a+b,0)/f.length):null;
+    const g=avg!==null?p2g(avg):null;
+    const ab=s.status==='absent',nr=s.status==='notready';
+
+    const vCols=[0,1,2,3].map(vi=>{
+      if(s.visits[vi]===null)return`<td class="vcell"><span class="vempty">—</span></td>`;
+      const dt=s.visitDates?.[vi]?new Date(s.visitDates[vi]).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'}):'';
+      return`<td class="vcell"><span class="vpct">${s.visits[vi]}%</span>${dt?`<span class="vdt">${dt}</span>`:''}</td>`;
     }).join('');
 
-    const statusPill=absent?`<div><span class="status-pill pill-absent">відсутній</span></div>`:
-      notready?`<div><span class="status-pill pill-notready">не готовий</span></div>`:'';
-    const commentIcon=s.comment?`<span class="comment-icon" title="${s.comment}">💬</span>`:'';
+    const spill=ab?`<div><span class="spill spill-ab">відсутній</span></div>`:
+      nr?`<div><span class="spill spill-nr">не готовий</span></div>`:'';
+    const cmnt=s.comment?`<span title="${s.comment}" style="cursor:default;font-size:13px">💬</span>`:'';
 
-    return `<tr>
-      <td class="num-cell">${idx+1}</td>
-      <td>
-        <div class="name-cell${absent?' name-missing':''}">${s.name}</div>
-        ${statusPill}
-      </td>
-      ${visitCols}
-      <td class="avg-cell">${avg!==null?avg+'%':'—'}</td>
-      <td><span class="grade-badge ${gc}">${grade!==null?grade:'—'}</span></td>
-      <td>${commentIcon}</td>
+    return`<tr>
+      <td class="nc">${i+1}</td>
+      <td><div class="name-text${ab?' name-absent':''}">${s.name}</div>${spill}</td>
+      ${vCols}
+      <td class="avg-td">${avg!==null?avg+'%':'—'}</td>
+      <td><span class="gb ${gCls(g)}">${g!==null?g:'—'}</span></td>
+      <td>${cmnt}</td>
     </tr>`;
   }).join('');
 
-  container.innerHTML=`
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th>Учень</th>
-            <th style="text-align:center">Вихід 1</th>
-            <th style="text-align:center">Вихід 2</th>
-            <th style="text-align:center">Вихід 3</th>
-            <th style="text-align:center">Вихід 4</th>
-            <th style="text-align:right">Сер.%</th>
-            <th>Оцінка</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
+  c.innerHTML=`<div class="tbl-wrap"><table>
+    <thead><tr>
+      <th>#</th><th>Учень</th>
+      <th style="text-align:center">В1</th><th style="text-align:center">В2</th>
+      <th style="text-align:center">В3</th><th style="text-align:center">В4</th>
+      <th style="text-align:right">сер%</th><th>оц</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
 }
 
 function refresh(){
-  loadData();renderTabs();renderTable();renderStats();
+  const prev=cc;
+  loadData();
+  if(prev&&db[prev])cc=prev;
+  renderTabs();renderTable();renderStats();
+  document.getElementById('refreshNote').textContent=`// оновлено ${new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})}`;
 }
 
-document.getElementById('todayDate').textContent=todayStr();
+document.getElementById('topDate').textContent=todayStr();
 
 if(!loadData()){
-  document.getElementById('tableContainer').innerHTML=`
+  document.getElementById('tblContainer').innerHTML=`
     <div class="no-data">
-      <div class="no-data-title">Даних ще немає</div>
-      <div class="no-data-sub">Відкрийте <a href="edit.html" style="color:var(--accent)">сторінку редагування</a> і введіть дані</div>
+      <div class="no-data-title">// даних немає</div>
+      <div class="no-data-sub">відкрийте <a href="edit.html">edit.html</a> і введіть дані</div>
     </div>`;
 } else {
   renderTabs();renderTable();renderStats();
+  document.getElementById('refreshNote').textContent=`// автооновлення кожні 30с`;
 }
 
-// Auto-refresh every 30s
-setInterval(refresh, 30000);
+setInterval(refresh,30000);
+
+// ── THEME ─────────────────────────────────────────────
+const THEME_KEY='boardTracker_theme';
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t==='dark'?'':t);
+  localStorage.setItem(THEME_KEY,t);
+  ['dark','light','mix'].forEach(k=>{
+    document.getElementById('tt-'+k)?.classList.toggle('on',k===t);
+  });
+}
+(function(){const t=localStorage.getItem(THEME_KEY)||'dark';setTheme(t);})();
 </script>
 </body>
 </html>

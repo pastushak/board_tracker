@@ -2,380 +2,538 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Трекер дошки — редагування</title>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600&family=Geologica:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>board-tracker / edit</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;
-  --border:#e2e0d8;--border2:#cccac0;
-  --text:#1a1916;--text2:#6b6960;--text3:#9e9c94;
-  --accent:#2d5a3d;--accent-light:#e8f2eb;
-  --danger:#8b2020;--danger-light:#fdf0f0;
-  --warn:#7a4a0a;--warn-light:#fdf5e8;
-  --blue:#1a3f6b;
-  --radius:10px;--radius-sm:6px;
+/* ── DARK (default) ── */
+:root{
+  --bg:#0d0f11;--bg2:#141618;--bg3:#1a1d21;--bg4:#22262b;
+  --border:#2a2f35;--border2:#363c44;
+  --text:#e8eaed;--text2:#8b949e;--text3:#484f58;
+  --accent:#d97706;--accent-dim:#92400e;--accent-light:rgba(217,119,6,.12);
+  --green:#22c55e;--green-dim:rgba(34,197,94,.12);
+  --red:#ef4444;--red-dim:rgba(239,68,68,.1);
+  --blue:#3b82f6;--blue-dim:rgba(59,130,246,.1);
+  --yellow:#eab308;--yellow-dim:rgba(234,179,8,.1);
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--r:6px;
+}
+/* ── LIGHT ── */
+[data-theme="light"]{
+  --bg:#f8f7f4;--bg2:#ffffff;--bg3:#f1f0ec;--bg4:#e8e6e1;
+  --border:#e0ddd6;--border2:#ccc9c0;
+  --text:#1a1916;--text2:#6b6960;--text3:#aaa89f;
+  --accent:#b45309;--accent-dim:#d97706;--accent-light:rgba(180,83,9,.1);
+  --green:#15803d;--green-dim:rgba(21,128,61,.1);
+  --red:#b91c1c;--red-dim:rgba(185,28,28,.08);
+  --blue:#1d4ed8;--blue-dim:rgba(29,78,216,.08);
+  --yellow:#92400e;--yellow-dim:rgba(146,64,14,.08);
+}
+/* ── MIX (light sidebar + dark content) ── */
+[data-theme="mix"]{
+  --bg:#0d0f11;--bg2:#ffffff;--bg3:#f1f0ec;--bg4:#e8e6e1;
+  --border:#e0ddd6;--border2:#ccc9c0;
+  --text:#1a1916;--text2:#6b6960;--text3:#aaa89f;
+  --accent:#d97706;--accent-dim:#92400e;--accent-light:rgba(217,119,6,.12);
+  --green:#15803d;--green-dim:rgba(21,128,61,.1);
+  --red:#b91c1c;--red-dim:rgba(185,28,28,.08);
+  --blue:#1d4ed8;--blue-dim:rgba(29,78,216,.08);
+  --yellow:#92400e;--yellow-dim:rgba(146,64,14,.08);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+html{font-size:14px;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* LOGIN */
-.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;}
-.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px 32px;width:360px;max-width:94vw;text-align:center;}
-.login-logo{font-family:'Unbounded',sans-serif;font-size:11px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:20px;}
-.login-title{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:500;margin-bottom:6px;}
-.login-sub{font-size:12px;color:var(--text3);margin-bottom:28px;}
-.login-fields{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
-.login-field{position:relative;}
-.login-field label{display:block;font-size:11px;color:var(--text3);text-align:left;margin-bottom:4px;letter-spacing:.04em;text-transform:uppercase;}
-.login-field input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-family:'Geologica',sans-serif;font-size:15px;color:var(--text);text-align:center;letter-spacing:.1em;transition:border-color .15s;}
-.login-field input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
-.login-btn{width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Geologica',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:background .15s;}
-.login-btn:hover{background:#234a31;}
-.login-err{font-size:12px;color:var(--danger);margin-top:10px;min-height:18px;}
-.login-hint{font-size:11px;color:var(--text3);margin-top:14px;}
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
-/* SHELL */
-.shell{display:flex;min-height:100vh;}
-.sidebar{width:260px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:10;}
-.main{margin-left:260px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+/* ── LOGIN ── */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+.login-box{width:100%;max-width:380px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:36px 32px;}
+.login-brand{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:8px;}
+.login-brand::before{content:'>';color:var(--accent);}
+.login-title{font-family:var(--mono);font-size:20px;font-weight:600;margin-bottom:4px;}
+.login-sub{font-size:12px;color:var(--text2);margin-bottom:28px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.field input{width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:15px;color:var(--text);letter-spacing:.15em;transition:border-color .15s,background .15s;}
+.field input:focus{outline:none;border-color:var(--accent);background:var(--bg4);}
+.field input::placeholder{color:var(--text3);letter-spacing:.05em;}
+.login-btn{width:100%;padding:11px;background:var(--accent);color:#000;border:none;border-radius:var(--r);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.04em;margin-top:4px;transition:opacity .15s;}
+.login-btn:hover{opacity:.9;}
+.login-err{font-family:var(--mono);font-size:11px;color:var(--red);margin-top:10px;min-height:16px;}
+.login-footer{font-size:11px;color:var(--text3);margin-top:18px;text-align:center;}
+.login-footer a{color:var(--accent);text-decoration:none;}
 
-/* SIDEBAR */
-.brand{padding:18px 18px 14px;border-bottom:1px solid var(--border);}
-.brand-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;}
-.brand-sub{font-size:11px;color:var(--text3);margin-top:2px;}
-.brand-mode{display:inline-block;margin-top:6px;font-size:10px;background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:20px;font-weight:500;}
+/* ── SHELL ── */
+.app{display:none;flex-direction:column;min-height:100vh;}
+.app.visible{display:flex;}
 
-.sidebar-section{padding:12px 14px 6px;}
-.sidebar-label{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:7px;}
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;gap:10px;padding:0 16px;height:48px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;flex-shrink:0;}
+.topbar-brand{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;white-space:nowrap;}
+.topbar-sep{color:var(--border2);font-family:var(--mono);}
+.topbar-class{font-family:var(--mono);font-size:12px;color:var(--text2);white-space:nowrap;}
+.topbar-date{font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:auto;white-space:nowrap;}
+.mode-pill{font-family:var(--mono);font-size:10px;background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-dim);border-radius:20px;padding:2px 10px;white-space:nowrap;}
+.logout-btn{font-family:var(--mono);font-size:11px;color:var(--text3);background:none;border:1px solid var(--border);border-radius:var(--r);padding:4px 10px;cursor:pointer;white-space:nowrap;transition:border-color .15s,color .15s;}
+.logout-btn:hover{border-color:var(--red);color:var(--red);}
+.theme-toggle{display:flex;gap:2px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:2px;flex-shrink:0;}
+.tt-btn{font-family:var(--mono);font-size:10px;padding:3px 8px;border:none;border-radius:4px;background:transparent;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.tt-btn.on{background:var(--accent);color:#000;font-weight:600;}
+.tt-btn:not(.on):hover{color:var(--text2);}
 
-.class-select{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-family:'Geologica',sans-serif;font-size:13px;color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%239e9c94' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
-.new-class-row{display:flex;gap:6px;margin-top:7px;}
-.new-class-row input{flex:1;min-width:0;}
+/* ── LAYOUT ── */
+.body-wrap{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 
-.inp{padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-family:'Geologica',sans-serif;font-size:13px;color:var(--text);width:100%;transition:border-color .15s,background .15s;}
-.inp:focus{outline:none;border-color:var(--accent);background:var(--surface);}
+/* ── SIDEBAR ── */
+.sb-section{padding:14px 14px 8px;}
+.sb-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.class-sel{width:100%;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:12px;color:var(--text);cursor:pointer;appearance:none;}
+.class-sel:focus{outline:none;border-color:var(--accent);}
+.row-gap{display:flex;gap:6px;margin-top:6px;}
+.inp{padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:13px;color:var(--text);width:100%;transition:border-color .15s;}
+.inp:focus{outline:none;border-color:var(--accent);}
 .inp::placeholder{color:var(--text3);}
 
-.btn{padding:7px 14px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:transparent;font-family:'Geologica',sans-serif;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;white-space:nowrap;transition:background .12s;}
-.btn:hover{background:var(--surface2);}
-.btn:active{transform:scale(.98);}
-.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent);}
-.btn-accent:hover{background:#234a31;}
-.btn-sm{padding:5px 10px;font-size:12px;}
-.btn-danger{color:var(--danger);border-color:#f0b8b8;}
-.btn-danger:hover{background:var(--danger-light);}
+.btn{padding:7px 12px;background:transparent;border:1px solid var(--border2);border-radius:var(--r);font-family:var(--mono);font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .12s;}
+.btn:hover{border-color:var(--text2);color:var(--text);}
+.btn:active{transform:scale(.97);}
+.btn-accent{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
+.btn-accent:hover{opacity:.9;color:#000;}
+.btn-sm{padding:5px 9px;font-size:11px;}
+.btn-danger{color:var(--red);border-color:var(--red-dim);}
+.btn-danger:hover{background:var(--red-dim);}
+.btn-full{width:100%;}
 
-.sidebar-stats{padding:10px 14px;background:var(--surface2);margin:0 10px 10px;border-radius:var(--radius);border:1px solid var(--border);}
-.ss-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;}
-.ss-row:last-child{margin-bottom:0;}
-.ss-label{font-size:11px;color:var(--text3);}
-.ss-val{font-size:14px;font-weight:500;}
-.ss-val.green{color:var(--accent);}
-.ss-val.blue{color:var(--blue);}
+.sb-stat{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--border);}
+.sb-stat:last-child{border-bottom:none;}
+.sb-stat-label{font-size:11px;color:var(--text2);}
+.sb-stat-val{font-family:var(--mono);font-size:13px;font-weight:500;}
+.val-green{color:var(--green);}
+.val-blue{color:var(--blue);}
+.val-yellow{color:var(--yellow);}
+.sb-stats-box{margin:0 10px 10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);}
 
-.picker-section{padding:12px 14px;border-top:1px solid var(--border);margin-top:auto;}
-.picker-name{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:500;color:var(--accent);text-align:center;min-height:22px;margin:10px 0 4px;transition:opacity .2s;}
-.picker-name.spinning{opacity:.3;}
-.picker-hint{font-size:11px;color:var(--text3);text-align:center;margin-bottom:8px;}
-.picker-mode{display:flex;gap:5px;margin-bottom:8px;}
-.picker-mode label{flex:1;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);cursor:pointer;padding:5px 7px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);}
-.picker-mode label:has(input:checked){background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
-.picker-mode input{display:none;}
+.picker-box{padding:12px 14px;border-top:1px solid var(--border);margin-top:auto;}
+.picker-modes{display:flex;gap:5px;margin-bottom:8px;}
+.pmode{flex:1;padding:5px 6px;font-family:var(--mono);font-size:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;color:var(--text2);text-align:center;transition:all .1s;}
+.pmode.on{background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
+.picker-result{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green);text-align:center;min-height:20px;margin:10px 0 3px;transition:opacity .15s;}
+.picker-result.spin{opacity:.25;}
+.picker-sub{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;margin-bottom:8px;}
 
-/* TOPBAR */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.topbar-title{font-family:'Unbounded',sans-serif;font-size:15px;font-weight:500;flex:1;min-width:120px;}
-.lesson-badge{background:var(--accent-light);color:var(--accent);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;}
-.today-date{font-size:12px;color:var(--text3);}
+/* ── TIMER ── */
+.timer-bar{display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.timer-digits{font-family:var(--mono);font-size:28px;font-weight:600;min-width:76px;color:var(--text);}
+.timer-digits.run{color:var(--green);}
+.timer-digits.over{color:var(--red);}
+.timer-info{flex:1;min-width:80px;}
+.timer-who{font-size:13px;font-weight:500;}
+.timer-hint{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:2px;}
+.timer-btns{display:flex;gap:6px;}
 
-/* TIMER */
-.timer-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin:14px 22px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.timer-display{font-family:'Unbounded',sans-serif;font-size:26px;font-weight:500;min-width:80px;}
-.timer-display.running{color:var(--accent);}
-.timer-display.overtime{color:var(--danger);}
-.timer-lbl{font-size:11px;color:var(--text3);margin-top:2px;}
-.timer-name{font-size:14px;font-weight:500;}
-.timer-status{font-size:11px;color:var(--text3);margin-top:2px;}
+/* ── STATS ── */
+.stats-strip{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
+.scard{flex:1;padding:10px 14px;background:var(--bg2);}
+.scard-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.scard-val{font-family:var(--mono);font-size:18px;font-weight:600;}
 
-/* LEGEND */
-.legend{display:flex;gap:12px;flex-wrap:wrap;padding:10px 22px;border-bottom:1px solid var(--border);background:var(--surface);}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);}
-.ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.toolbar-left{display:flex;gap:6px;flex:1;flex-wrap:wrap;}
 
-/* CONTENT */
-.content{padding:18px 22px;flex:1;}
-.stats-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
-.stat-card{flex:1;min-width:88px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;}
-.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
-.stat-val{font-size:20px;font-weight:500;font-family:'Unbounded',sans-serif;}
-.stat-sub{font-size:11px;color:var(--text3);margin-top:2px;}
-
-.add-student-row{display:flex;gap:8px;margin-bottom:14px;}
-
-/* TABLE */
-.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);}
-table{width:100%;border-collapse:collapse;}
-thead{background:var(--surface2);}
-th{padding:9px 9px;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
-td{padding:5px 9px;border-bottom:1px solid var(--border);vertical-align:middle;}
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;flex:1;}
+table{width:100%;border-collapse:collapse;min-width:520px;}
+thead{position:sticky;top:0;z-index:5;}
+th{padding:8px 10px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);text-align:left;background:var(--bg3);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-tbody tr:hover td{background:#fafaf7;}
-.num-cell{width:26px;color:var(--text3);font-size:12px;}
-.name-cell{font-weight:400;min-width:130px;font-size:13px;}
-.name-missing{color:var(--text3);text-decoration:line-through;}
+tbody tr:hover td{background:rgba(255,255,255,.02);}
+.nc{width:26px;font-family:var(--mono);font-size:11px;color:var(--text3);}
 
-.visit-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:58px;}
-.visit-input{width:50px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:'Geologica',sans-serif;font-size:13px;text-align:center;padding:0 3px;transition:border-color .15s,background .15s;}
-.visit-input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
-.visit-input.filled{border-color:#7ab98a;background:#f0faf3;color:#1e5a2a;font-weight:500;}
-.visit-input:disabled{opacity:.3;cursor:not-allowed;}
-.visit-date{font-size:10px;color:var(--text3);white-space:nowrap;}
+/* name cell */
+.name-wrap{display:flex;flex-direction:column;gap:2px;}
+.name-text{font-size:13px;}
+.name-absent{color:var(--text3);text-decoration:line-through;}
+.status-row{display:flex;gap:4px;}
+.stbtn{padding:2px 7px;font-family:var(--mono);font-size:9px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;color:var(--text3);transition:all .1s;}
+.stbtn:hover{border-color:var(--text2);}
+.stbtn.absent{background:var(--yellow-dim);color:var(--yellow);border-color:rgba(234,179,8,.3);}
+.stbtn.notready{background:var(--red-dim);color:var(--red);border-color:rgba(239,68,68,.3);}
 
-.status-btns{display:flex;gap:3px;margin-top:3px;}
-.status-btn{padding:2px 6px;font-size:10px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;color:var(--text2);transition:background .1s;}
-.status-btn.active-absent{background:var(--warn-light);color:var(--warn);border-color:#e8c87a;}
-.status-btn.active-notready{background:var(--danger-light);color:var(--danger);border-color:#f0b8b8;}
+/* visit cell */
+.vc{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:54px;}
+.vi{width:50px;height:30px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:13px;color:var(--text);text-align:center;padding:0 4px;transition:border-color .15s,background .15s;}
+.vi:focus{outline:none;border-color:var(--accent);background:var(--bg4);}
+.vi.ok{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.07);color:var(--green);}
+.vi:disabled{opacity:.25;cursor:not-allowed;}
+.vdate{font-family:var(--mono);font-size:9px;color:var(--text3);}
 
-.avg-cell{text-align:right;color:var(--text2);font-size:13px;min-width:48px;}
-.grade-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:26px;border-radius:var(--radius-sm);font-family:'Unbounded',sans-serif;font-size:13px;font-weight:500;}
-.g-high{background:#eaf5ee;color:#1e5a2a;}
-.g-good{background:#eaf0f8;color:#1a3f6b;}
-.g-mid{background:#fdf5e8;color:#7a4a0a;}
-.g-low{background:#fdf0f0;color:#8b2020;}
-.g-none{background:var(--surface2);color:var(--text3);}
+.avg-td{font-family:var(--mono);font-size:12px;color:var(--text2);text-align:right;white-space:nowrap;}
 
-.comment-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:3px 5px;border-radius:4px;color:var(--text3);line-height:1;}
-.comment-btn:hover{color:var(--text);background:var(--surface2);}
-.comment-btn.has-comment{color:var(--accent);}
-.remove-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 5px;border-radius:4px;line-height:1;}
-.remove-btn:hover{color:var(--danger);background:var(--danger-light);}
+/* grade badge */
+.gb{display:inline-flex;align-items:center;justify-content:center;width:32px;height:26px;border-radius:var(--r);font-family:var(--mono);font-size:13px;font-weight:600;}
+.gh{background:rgba(34,197,94,.15);color:var(--green);}
+.gg{background:rgba(59,130,246,.15);color:var(--blue);}
+.gm{background:rgba(234,179,8,.15);color:var(--yellow);}
+.gl{background:rgba(239,68,68,.15);color:var(--red);}
+.gn{background:var(--bg3);color:var(--text3);}
 
-/* EXPORT */
-.export-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-top:16px;}
-.export-title{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
-.export-pre{font-family:'Geologica',monospace;font-size:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;white-space:pre;overflow-x:auto;max-height:200px;overflow-y:auto;line-height:1.7;}
+.cbtn{background:none;border:none;cursor:pointer;font-size:13px;padding:3px 5px;border-radius:4px;color:var(--text3);line-height:1;}
+.cbtn:hover{background:var(--bg4);}
+.cbtn.hc{color:var(--accent);}
+.rbtn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;padding:2px 5px;border-radius:4px;line-height:1;}
+.rbtn:hover{color:var(--red);background:var(--red-dim);}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(26,25,22,.5);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .15s;}
-.modal-overlay.open{opacity:1;pointer-events:all;}
-.modal{background:var(--surface);border-radius:var(--radius);padding:22px;width:320px;max-width:92vw;border:1px solid var(--border);transform:translateY(8px);transition:transform .15s;}
-.modal-overlay.open .modal{transform:translateY(0);}
-.modal-title{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:500;margin-bottom:12px;}
-.modal textarea{width:100%;height:90px;resize:none;padding:9px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Geologica',sans-serif;font-size:13px;color:var(--text);background:var(--surface2);line-height:1.5;}
+/* ── EXPORT ── */
+.export-box{margin:14px 16px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);}
+.export-hdr{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.export-pre{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px;white-space:pre;overflow-x:auto;max-height:180px;overflow-y:auto;color:var(--text2);line-height:1.7;}
+.export-btns{display:flex;gap:6px;margin-top:8px;}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .15s;padding:16px;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:22px;width:100%;max-width:340px;transform:translateY(8px);transition:transform .15s;}
+.overlay.open .modal{transform:translateY(0);}
+.modal-title{font-family:var(--mono);font-size:12px;font-weight:600;margin-bottom:12px;color:var(--text);}
+.modal textarea{width:100%;height:90px;resize:none;padding:9px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:13px;color:var(--text);line-height:1.5;}
 .modal textarea:focus{outline:none;border-color:var(--accent);}
 .modal-btns{display:flex;gap:7px;justify-content:flex-end;margin-top:10px;}
 
-/* LOGOUT */
-.logout-btn{font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:var(--radius-sm);}
-.logout-btn:hover{background:var(--surface2);color:var(--danger);}
+/* ── MOBILE BOTTOM NAV ── */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:100;padding:0 8px env(safe-area-inset-bottom);}
+.mob-nav-inner{display:flex;justify-content:space-around;}
+.mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;gap:3px;cursor:pointer;color:var(--text3);font-family:var(--mono);font-size:9px;letter-spacing:.04em;border:none;background:none;transition:color .15s;}
+.mob-tab.active{color:var(--accent);}
+.mob-tab svg{width:20px;height:20px;}
 
-@media(max-width:700px){.sidebar{display:none;}.main{margin-left:0;}}
+/* ── MOBILE PANEL SYSTEM ── */
+.mob-panels{display:none;flex:1;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .body-wrap{flex-direction:column;}
+  .topbar-date{display:none;}
+  .logout-btn{display:none;}
+  .stats-strip{overflow-x:auto;}
+  .scard{min-width:80px;}
+  .timer-digits{font-size:22px;}
+  .mob-nav{display:block;}
+  .mob-panels{display:flex;flex-direction:column;}
+  .main{display:none;}
+  .mob-panel{display:none;flex:1;overflow-y:auto;padding-bottom:70px;}
+  .mob-panel.active{display:block;}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table{min-width:460px;}
+  .vi{width:44px;font-size:12px;}
+  .vc{min-width:46px;}
+}
+@media(min-width:769px){
+  .mob-nav{display:none;}
+  .sidebar{display:flex;}
+  .main{display:flex;}
+}
 </style>
 </head>
 <body>
 
-<!-- ═══ LOGIN SCREEN ═══ -->
-<div class="login-screen" id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">Трекер дошки</div>
-    <div class="login-title">Вхід для вчителя</div>
-    <div class="login-sub">Введіть PIN і пароль для доступу до редагування</div>
-    <div class="login-fields">
-      <div class="login-field">
-        <label>PIN-код</label>
-        <input type="password" id="pinInput" placeholder="••••" maxlength="10" inputmode="numeric" />
-      </div>
-      <div class="login-field">
-        <label>Пароль</label>
-        <input type="password" id="passInput" placeholder="••••••••" maxlength="40" />
-      </div>
-    </div>
-    <button class="login-btn" onclick="doLogin()">Увійти</button>
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-brand">board-tracker / auth</div>
+    <div class="login-title">Вхід</div>
+    <div class="login-sub">Режим редагування — тільки для вчителя</div>
+    <div class="field"><label>PIN-код</label><input type="password" id="pinInp" placeholder="••••" maxlength="10" inputmode="numeric"/></div>
+    <div class="field"><label>Пароль</label><input type="password" id="passInp" placeholder="••••••••" maxlength="40"/></div>
+    <button class="login-btn" onclick="doLogin()">Увійти →</button>
     <div class="login-err" id="loginErr"></div>
-    <div class="login-hint">Режим перегляду доступний на <a href="index.html" style="color:var(--accent)">головній сторінці</a></div>
+    <div class="login-footer">Перегляд без входу: <a href="index.html">index.html</a></div>
   </div>
 </div>
 
-<!-- ═══ APP ═══ -->
-<div class="shell" id="appShell" style="display:none">
+<!-- APP -->
+<div class="app" id="app">
 
-<aside class="sidebar">
-  <div class="brand">
-    <div class="brand-title">Трекер дошки</div>
-    <div class="brand-sub">Математика · облік виходів</div>
-    <div class="brand-mode">Режим редагування</div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Клас</div>
-    <select class="class-select" id="classSelect" onchange="switchClass()"></select>
-    <div class="new-class-row">
-      <input class="inp" type="text" id="newClassName" placeholder="Новий клас..." maxlength="20" />
-      <button class="btn btn-sm" onclick="addClass()">+</button>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Статистика уроку</div>
-  </div>
-  <div class="sidebar-stats">
-    <div class="ss-row"><span class="ss-label">Учнів</span><span class="ss-val" id="ss-total">—</span></div>
-    <div class="ss-row"><span class="ss-label">Виходів сьогодні</span><span class="ss-val blue" id="ss-today">—</span></div>
-    <div class="ss-row"><span class="ss-label">Оцінено</span><span class="ss-val" id="ss-graded">—</span></div>
-    <div class="ss-row"><span class="ss-label">Середня оцінка</span><span class="ss-val green" id="ss-avg">—</span></div>
-    <div class="ss-row"><span class="ss-label">Якість ≥7</span><span class="ss-val" id="ss-quality">—</span></div>
-    <div class="ss-row"><span class="ss-label">Ще не виходили</span><span class="ss-val" id="ss-never">—</span></div>
-  </div>
-
-  <div class="picker-section">
-    <div class="sidebar-label">Хто йде до дошки?</div>
-    <div class="picker-mode">
-      <label><input type="radio" name="pickerMode" value="never" checked> Ще не виходили</label>
-      <label><input type="radio" name="pickerMode" value="all"> Усі</label>
-    </div>
-    <button class="btn btn-accent" style="width:100%" onclick="pickRandom()">Вибрати учня</button>
-    <div class="picker-name" id="pickerName">—</div>
-    <div class="picker-hint" id="pickerHint"></div>
-    <button class="logout-btn" onclick="doLogout()" style="width:100%;margin-top:10px;">Вийти з режиму редагування</button>
-  </div>
-</aside>
-
-<main class="main">
+  <!-- TOPBAR -->
   <div class="topbar">
-    <div class="topbar-title" id="topTitle">Клас</div>
-    <span class="today-date" id="todayDate"></span>
-    <span class="lesson-badge" id="lessonBadge">Урок</span>
-    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-left:auto">
-      <button class="btn btn-sm" onclick="exportCSV()">Експорт CSV</button>
-      <button class="btn btn-sm btn-danger" onclick="clearGrades()">Очистити оцінки</button>
+    <span class="topbar-brand">board-tracker</span>
+    <span class="topbar-sep">/</span>
+    <span class="topbar-class" id="topClass">—</span>
+    <span class="topbar-date" id="topDate"></span>
+    <span class="mode-pill">edit</span>
+    <div class="theme-toggle">
+      <button class="tt-btn on" id="tt-dark"  onclick="setTheme('dark')">dark</button>
+      <button class="tt-btn"    id="tt-light" onclick="setTheme('light')">light</button>
+      <button class="tt-btn"    id="tt-mix"   onclick="setTheme('mix')">mix</button>
     </div>
+    <button class="logout-btn" onclick="doLogout()">logout</button>
   </div>
 
-  <div class="timer-panel">
-    <div>
-      <div class="timer-display" id="timerDisplay">0:00</div>
-      <div class="timer-lbl">Таймер виходу</div>
-    </div>
-    <div style="flex:1">
-      <div class="timer-name" id="timerStudentName">—</div>
-      <div class="timer-status" id="timerStatus">Оберіть учня і запустіть таймер</div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:5px">
-      <button class="btn btn-accent btn-sm" id="timerStartBtn" onclick="toggleTimer()">Старт</button>
-      <button class="btn btn-sm" onclick="resetTimer()">Скид</button>
-    </div>
-  </div>
+  <div class="body-wrap">
+    <!-- SIDEBAR (desktop) -->
+    <aside class="sidebar">
+      <div class="sb-section">
+        <div class="sb-label">Клас</div>
+        <select class="class-sel" id="classSel" onchange="switchClass()"></select>
+        <div class="row-gap">
+          <input class="inp" type="text" id="newClsInp" placeholder="Новий клас..." maxlength="20"/>
+          <button class="btn btn-sm" onclick="addClass()">+</button>
+        </div>
+        <button class="btn btn-sm" style="width:100%;margin-top:5px;font-size:11px" onclick="renameClass()">перейменувати клас</button>
+      </div>
 
-  <div class="legend">
-    <div class="legend-item"><div class="ldot" style="background:#7ab98a"></div> Введено</div>
-    <div class="legend-item"><div class="ldot" style="background:#c0392b"></div> 1–3</div>
-    <div class="legend-item"><div class="ldot" style="background:#d68910"></div> 4–6</div>
-    <div class="legend-item"><div class="ldot" style="background:#1a5276"></div> 7–9</div>
-    <div class="legend-item"><div class="ldot" style="background:#1e5a2a"></div> 10–12</div>
-    <div class="legend-item"><div class="ldot" style="background:#e8c87a"></div> Відсутній</div>
-    <div class="legend-item"><div class="ldot" style="background:#f0b8b8"></div> Не готовий</div>
-  </div>
+      <div class="sb-section"><div class="sb-label">Статистика</div></div>
+      <div class="sb-stats-box" id="sbStats">
+        <div class="sb-stat"><span class="sb-stat-label">Учнів</span><span class="sb-stat-val" id="sb-total">—</span></div>
+        <div class="sb-stat"><span class="sb-stat-label">Сьогодні виходів</span><span class="sb-stat-val val-blue" id="sb-today">—</span></div>
+        <div class="sb-stat"><span class="sb-stat-label">Оцінено</span><span class="sb-stat-val" id="sb-graded">—</span></div>
+        <div class="sb-stat"><span class="sb-stat-label">Сер. оцінка</span><span class="sb-stat-val val-green" id="sb-avg">—</span></div>
+        <div class="sb-stat"><span class="sb-stat-label">Якість ≥7</span><span class="sb-stat-val" id="sb-quality">—</span></div>
+        <div class="sb-stat"><span class="sb-stat-label">Не виходили</span><span class="sb-stat-val val-yellow" id="sb-never">—</span></div>
+      </div>
 
-  <div class="content">
-    <div class="add-student-row">
-      <input class="inp" type="text" id="newStudentName" placeholder="Додати учня (Прізвище Ім'я)..." maxlength="50" style="max-width:300px" />
-      <button class="btn btn-accent" onclick="addStudent()">+ Учень</button>
-    </div>
+      <div class="picker-box">
+        <div class="sb-label">Хто до дошки?</div>
+        <div class="picker-modes">
+          <button class="pmode on" id="pm-never" onclick="setPMode('never')">не виходили</button>
+          <button class="pmode" id="pm-all" onclick="setPMode('all')">усі</button>
+        </div>
+        <button class="btn btn-accent btn-full" onclick="pickRandom()">▶ Вибрати учня</button>
+        <div class="picker-result" id="pickerResult">—</div>
+        <div class="picker-sub" id="pickerSub"></div>
+      </div>
+    </aside>
 
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-label">Учнів</div><div class="stat-val" id="st-total">0</div><div class="stat-sub">у списку</div></div>
-      <div class="stat-card"><div class="stat-label">Оцінено</div><div class="stat-val" id="st-graded">0</div><div class="stat-sub">мають оцінку</div></div>
-      <div class="stat-card"><div class="stat-label">Сер. оцінка</div><div class="stat-val" id="st-avg">—</div><div class="stat-sub">1–12 шкала</div></div>
-      <div class="stat-card"><div class="stat-label">Якість ≥7</div><div class="stat-val" id="st-quality">—</div><div class="stat-sub">достатній рівень</div></div>
-    </div>
+    <!-- MAIN (desktop) -->
+    <div class="main" id="mainArea">
+      <!-- TIMER -->
+      <div class="timer-bar">
+        <div><div class="timer-digits" id="timerDig">0:00</div><div class="timer-hint">таймер виходу</div></div>
+        <div class="timer-info"><div class="timer-who" id="timerWho">—</div><div class="timer-hint" id="timerHint">оберіть учня</div></div>
+        <div class="timer-btns">
+          <button class="btn btn-accent btn-sm" id="timerBtn" onclick="toggleTimer()">старт</button>
+          <button class="btn btn-sm" onclick="resetTimer()">скид</button>
+        </div>
+      </div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
+      <!-- STATS STRIP -->
+      <div class="stats-strip">
+        <div class="scard"><div class="scard-label">Учнів</div><div class="scard-val" id="sc-total">0</div></div>
+        <div class="scard"><div class="scard-label">Оцінено</div><div class="scard-val" id="sc-graded">0</div></div>
+        <div class="scard"><div class="scard-label">Сер. оцінка</div><div class="scard-val" id="sc-avg">—</div></div>
+        <div class="scard"><div class="scard-label">Якість ≥7</div><div class="scard-val" id="sc-quality">—</div></div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input class="inp" type="text" id="newStudInp" placeholder="Додати учня..." maxlength="50" style="max-width:240px"/>
+          <button class="btn btn-accent btn-sm" onclick="addStudent()">+ учень</button>
+        </div>
+        <button class="btn btn-sm" onclick="exportCSV()">CSV</button>
+        <button class="btn btn-sm btn-danger" onclick="clearGrades()">очистити</button>
+      </div>
+
+      <!-- TABLE -->
+      <div class="tbl-wrap">
+        <table><thead><tr>
+          <th>#</th><th>Учень</th>
+          <th>В1</th><th>В2</th><th>В3</th><th>В4</th>
+          <th style="text-align:right">сер%</th><th>оц</th><th></th><th></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody></table>
+      </div>
+
+      <!-- EXPORT -->
+      <div class="export-box" id="exportBox" style="display:none">
+        <div class="export-hdr">// для журналу</div>
+        <pre class="export-pre" id="exportPre"></pre>
+        <div class="export-btns">
+          <button class="btn btn-sm" onclick="copyExport()">copy</button>
+          <button class="btn btn-sm" onclick="exportCSV()">csv</button>
+        </div>
+      </div>
+    </div><!-- /main -->
+
+    <!-- MOBILE PANELS -->
+    <div class="mob-panels">
+      <!-- Panel: Журнал -->
+      <div class="mob-panel active" id="mp-journal">
+        <div class="timer-bar">
+          <div><div class="timer-digits" id="mTimerDig">0:00</div><div class="timer-hint">таймер</div></div>
+          <div class="timer-info"><div class="timer-who" id="mTimerWho">—</div><div class="timer-hint" id="mTimerHint">оберіть учня</div></div>
+          <div class="timer-btns">
+            <button class="btn btn-accent btn-sm" id="mTimerBtn" onclick="toggleTimer()">старт</button>
+            <button class="btn btn-sm" onclick="resetTimer()">скид</button>
+          </div>
+        </div>
+        <div class="stats-strip">
+          <div class="scard"><div class="scard-label">Учнів</div><div class="scard-val" id="msc-total">0</div></div>
+          <div class="scard"><div class="scard-label">Оцінено</div><div class="scard-val" id="msc-graded">0</div></div>
+          <div class="scard"><div class="scard-label">Сер.оц</div><div class="scard-val" id="msc-avg">—</div></div>
+          <div class="scard"><div class="scard-label">≥7</div><div class="scard-val" id="msc-quality">—</div></div>
+        </div>
+        <div class="toolbar">
+          <input class="inp" type="text" id="mNewStudInp" placeholder="Додати учня..." maxlength="50" style="flex:1"/>
+          <button class="btn btn-accent btn-sm" onclick="addStudentMob()">+</button>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr>
             <th>#</th><th>Учень</th>
-            <th>Вихід 1</th><th>Вихід 2</th><th>Вихід 3</th><th>Вихід 4</th>
-            <th style="text-align:right">Сер.%</th><th>Оцінка</th><th>💬</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
+            <th>В1</th><th>В2</th><th>В3</th><th>В4</th>
+            <th style="text-align:right">%</th><th>оц</th><th></th><th></th>
+          </tr></thead>
+          <tbody id="mtbody"></tbody></table>
+        </div>
+        <div class="export-box" id="mExportBox" style="display:none;margin-bottom:70px">
+          <div class="export-hdr">// для журналу</div>
+          <pre class="export-pre" id="mExportPre"></pre>
+          <div class="export-btns"><button class="btn btn-sm" onclick="copyExportMob()">copy</button></div>
+        </div>
+      </div>
 
-    <div class="export-section" id="exportSection" style="display:none">
-      <div class="export-title">Для журналу</div>
-      <pre class="export-pre" id="exportPre"></pre>
-      <div style="display:flex;gap:7px;margin-top:10px">
-        <button class="btn btn-sm" onclick="copyExport()">Скопіювати</button>
-        <button class="btn btn-sm" onclick="exportCSV()">Зберегти CSV</button>
+      <!-- Panel: Вибір учня -->
+      <div class="mob-panel" id="mp-picker">
+        <div style="padding:16px">
+          <div class="sb-label" style="margin-bottom:10px">Хто до дошки?</div>
+          <div class="picker-modes" style="margin-bottom:12px">
+            <button class="pmode on" id="mpm-never" onclick="setPMode('never')">не виходили</button>
+            <button class="pmode" id="mpm-all" onclick="setPMode('all')">усі</button>
+          </div>
+          <button class="btn btn-accent btn-full" style="margin-bottom:16px" onclick="pickRandom()">▶ Вибрати учня</button>
+          <div class="picker-result" id="mPickerResult" style="font-size:18px;margin-bottom:4px">—</div>
+          <div class="picker-sub" id="mPickerSub" style="margin-bottom:20px"></div>
+          <div class="sb-label" style="margin-bottom:10px">Клас</div>
+          <select class="class-sel" id="mClassSel" onchange="switchClassMob()" style="margin-bottom:8px"></select>
+          <div class="row-gap">
+            <input class="inp" type="text" id="mNewClsInp" placeholder="Новий клас..." maxlength="20"/>
+            <button class="btn btn-sm" onclick="addClassMob()">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Статистика -->
+      <div class="mob-panel" id="mp-stats">
+        <div style="padding:16px;padding-bottom:70px">
+          <div class="sb-label" style="margin-bottom:10px">Детальна статистика</div>
+          <div class="sb-stats-box" style="margin:0 0 16px">
+            <div class="sb-stat"><span class="sb-stat-label">Учнів у класі</span><span class="sb-stat-val" id="mSb-total">—</span></div>
+            <div class="sb-stat"><span class="sb-stat-label">Виходів сьогодні</span><span class="sb-stat-val val-blue" id="mSb-today">—</span></div>
+            <div class="sb-stat"><span class="sb-stat-label">Оцінено</span><span class="sb-stat-val" id="mSb-graded">—</span></div>
+            <div class="sb-stat"><span class="sb-stat-label">Середня оцінка</span><span class="sb-stat-val val-green" id="mSb-avg">—</span></div>
+            <div class="sb-stat"><span class="sb-stat-label">Якість ≥7</span><span class="sb-stat-val" id="mSb-quality">—</span></div>
+            <div class="sb-stat"><span class="sb-stat-label">Ще не виходили</span><span class="sb-stat-val val-yellow" id="mSb-never">—</span></div>
+          </div>
+          <button class="btn btn-sm btn-danger btn-full" onclick="clearGrades()" style="margin-bottom:8px">Очистити оцінки</button>
+          <button class="btn btn-sm btn-full" onclick="exportCSV()">Експорт CSV</button>
+          <button class="btn btn-sm btn-full" onclick="renameClass()" style="margin-top:8px">Перейменувати клас</button>
+          <div style="margin-top:14px">
+            <div class="sb-label" style="margin-bottom:8px">Тема</div>
+            <div class="theme-toggle" style="width:100%">
+              <button class="tt-btn on" id="mtt-dark"  onclick="setTheme('dark')"  style="flex:1">dark</button>
+              <button class="tt-btn"    id="mtt-light" onclick="setTheme('light')" style="flex:1">light</button>
+              <button class="tt-btn"    id="mtt-mix"   onclick="setTheme('mix')"   style="flex:1">mix</button>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-full" onclick="doLogout()" style="margin-top:8px;color:var(--red)">Вийти</button>
+        </div>
       </div>
     </div>
-  </div>
-</main>
-</div>
+  </div><!-- /body-wrap -->
+</div><!-- /app -->
 
 <!-- COMMENT MODAL -->
-<div class="modal-overlay" id="commentModal" onclick="closeCommentModal(event)">
+<div class="overlay" id="commentOverlay" onclick="closeComment(event)">
   <div class="modal">
-    <div class="modal-title" id="commentModalTitle">Коментар</div>
-    <textarea id="commentText" placeholder="Тема виходу, помилки, похвала..."></textarea>
+    <div class="modal-title" id="commentTitle">// коментар</div>
+    <textarea id="commentTa" placeholder="тема виходу, помилки, похвала..."></textarea>
     <div class="modal-btns">
-      <button class="btn btn-sm btn-danger" onclick="clearComment()">Видалити</button>
-      <button class="btn btn-sm" onclick="closeCommentModal()">Скасувати</button>
-      <button class="btn btn-sm btn-accent" onclick="saveComment()">Зберегти</button>
+      <button class="btn btn-sm btn-danger" onclick="clearComment()">видалити</button>
+      <button class="btn btn-sm" onclick="closeComment()">скасувати</button>
+      <button class="btn btn-sm btn-accent" onclick="saveComment()">зберегти</button>
     </div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mob-nav">
+  <div class="mob-nav-inner">
+    <button class="mob-tab active" id="mnt-journal" onclick="showMobPanel('journal')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      журнал
+    </button>
+    <button class="mob-tab" id="mnt-picker" onclick="showMobPanel('picker')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      вибір
+    </button>
+    <button class="mob-tab" id="mnt-stats" onclick="showMobPanel('stats')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 20h18M7 20V10M12 20V4M17 20v-6"/></svg>
+      статс
+    </button>
   </div>
 </div>
 
 <script>
-// ╔══════════════════════════════════════════════════════╗
-// ║  ЗМІНИ ПАРОЛЬ ТУТ — рядок нижче                     ║
-const AUTH_PIN  = '1234';       // ← твій PIN
-const AUTH_PASS = 'math2026';   // ← твій пароль
-// ╚══════════════════════════════════════════════════════╝
+// ╔═══════════════════════════════════════╗
+// ║  ЗМІНИТИ ПАРОЛЬ ТУТ                   ║
+const AUTH_PIN  = '1234';
+const AUTH_PASS = 'math2026';
+// ╚═══════════════════════════════════════╝
 
-const SESSION_KEY = 'boardTracker_auth';
+const SK = 'boardTracker_auth';
+const DK = 'boardTracker_v2';
 
-function doLogin() {
-  const pin  = document.getElementById('pinInput').value.trim();
-  const pass = document.getElementById('passInput').value.trim();
-  if (pin === AUTH_PIN && pass === AUTH_PASS) {
-    sessionStorage.setItem(SESSION_KEY, '1');
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appShell').style.display = 'flex';
-    load(); render();
+// ── AUTH ──────────────────────────────────────────────
+function doLogin(){
+  const pin=document.getElementById('pinInp').value.trim();
+  const pass=document.getElementById('passInp').value.trim();
+  if(pin===AUTH_PIN && pass===AUTH_PASS){
+    sessionStorage.setItem(SK,'1');
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('app').classList.add('visible');
+    load();render();
   } else {
-    const err = document.getElementById('loginErr');
-    err.textContent = 'Невірний PIN або пароль. Спробуй ще раз.';
-    document.getElementById('pinInput').value = '';
-    document.getElementById('passInput').value = '';
-    document.getElementById('pinInput').focus();
-    setTimeout(() => err.textContent = '', 3000);
+    const e=document.getElementById('loginErr');
+    e.textContent='// невірний PIN або пароль';
+    document.getElementById('pinInp').value='';
+    document.getElementById('passInp').value='';
+    document.getElementById('pinInp').focus();
+    setTimeout(()=>e.textContent='',3000);
   }
 }
-
-function doLogout() {
-  sessionStorage.removeItem(SESSION_KEY);
-  document.getElementById('appShell').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('pinInput').value = '';
-  document.getElementById('passInput').value = '';
+function doLogout(){
+  sessionStorage.removeItem(SK);
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('pinInp').value='';
+  document.getElementById('passInp').value='';
 }
-
-// Auto-login if session active
-if (sessionStorage.getItem(SESSION_KEY)) {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('appShell').style.display = 'flex';
-}
-
-// Enter key on login
-['pinInput','passInput'].forEach(id =>
-  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); })
+['pinInp','passInp'].forEach(id=>
+  document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();})
 );
+if(sessionStorage.getItem(SK)){
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('app').classList.add('visible');
+}
+
+// ── MOBILE PANELS ─────────────────────────────────────
+function showMobPanel(name){
+  ['journal','picker','stats'].forEach(p=>{
+    document.getElementById('mp-'+p).classList.toggle('active',p===name);
+    document.getElementById('mnt-'+p).classList.toggle('active',p===name);
+  });
+}
 
 // ── DATA ──────────────────────────────────────────────
-const ROSTER_DEFAULT = [
+const ROSTER=[
   'Венгринська Ольга','Винничук Дарина','Виноградов Даниїл','Вовк Анастасія',
   'Воробець Софія','Герелюк Ангеліна','Глущенко Олексій','Голіней Павло',
   'Григорчук Ігор','Дмитрук Матвій','Кравець Богдан','Лазаренко Роман',
@@ -385,265 +543,313 @@ const ROSTER_DEFAULT = [
   'Рижняк Злата','Суботяк Каміла','Ткачук Марко','Уржумцева Олександра',
   'Федорак Злата','Федорак Кароліна','Шкляр Артур'
 ];
-const GRADE_SCALE=[[90,12],[83,11],[75,10],[67,9],[59,8],[50,7],[42,6],[34,5],[26,4],[17,3],[8,2],[0,1]];
-function pctToGrade(p){for(const[min,g]of GRADE_SCALE)if(p>=min)return g;return 1;}
-function gradeStyle(g){if(g===null)return 'g-none';if(g>=10)return 'g-high';if(g>=7)return 'g-good';if(g>=4)return 'g-mid';return 'g-low';}
-function todayStr(){return new Date().toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});}
-function todayISO(){return new Date().toISOString().slice(0,10);}
+const GS=[[90,12],[83,11],[75,10],[67,9],[59,8],[50,7],[42,6],[34,5],[26,4],[17,3],[8,2],[0,1]];
+const p2g=p=>{for(const[m,g]of GS)if(p>=m)return g;return 1;};
+const gCls=g=>{if(g===null)return 'gn';if(g>=10)return 'gh';if(g>=7)return 'gg';if(g>=4)return 'gm';return 'gl';};
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const todayStr=()=>new Date().toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});
 
-let idCtr=0, db={}, currentClass='', commentTarget=null;
+let idc=0,db={},cc='',cTarget=null,pickerMode='never';
 
-function save(){try{localStorage.setItem('boardTracker_v2',JSON.stringify({db,currentClass,idCtr}));}catch(e){}}
+function save(){try{localStorage.setItem(DK,JSON.stringify({db,currentClass:cc,idCtr:idc}));}catch(e){}}
 function load(){
-  try{
-    const raw=localStorage.getItem('boardTracker_v2');
-    if(raw){const d=JSON.parse(raw);db=d.db||{};currentClass=d.currentClass||'';idCtr=d.idCtr||0;}
-  }catch(e){}
-  if(!Object.keys(db).length){
-    db['7-А']={students:ROSTER_DEFAULT.map(n=>makeStudent(n)),lessonCount:1};
-    currentClass='7-А'; save();
-  }
-  if(!currentClass||!db[currentClass])currentClass=Object.keys(db)[0];
+  try{const r=localStorage.getItem(DK);if(r){const d=JSON.parse(r);db=d.db||{};cc=d.currentClass||'';idc=d.idCtr||0;}}catch(e){}
+  if(!Object.keys(db).length){db['6-А']={students:ROSTER.map(n=>mkS(n)),lessonCount:1};cc='6-А';save();}
+  if(!cc||!db[cc])cc=Object.keys(db)[0];
 }
-function makeStudent(name){return{id:idCtr++,name,visits:[null,null,null,null],visitDates:[null,null,null,null],status:null,comment:''};}
+function mkS(name){return{id:idc++,name,visits:[null,null,null,null],visitDates:[null,null,null,null],status:null,comment:''};}
+function gS(id){return db[cc].students.find(x=>x.id===id);}
 
+// ── CLASS ─────────────────────────────────────────────
 function addClass(){
-  const n=document.getElementById('newClassName').value.trim();
+  const n=document.getElementById('newClsInp').value.trim();
   if(!n||db[n])return;
-  db[n]={students:[],lessonCount:1};currentClass=n;
-  document.getElementById('newClassName').value='';
-  save();renderClassSelect();render();
+  db[n]={students:[],lessonCount:1};cc=n;
+  document.getElementById('newClsInp').value='';
+  save();renderClassSels();render();
 }
-function switchClass(){currentClass=document.getElementById('classSelect').value;save();render();}
-function renderClassSelect(){
-  const sel=document.getElementById('classSelect');
-  sel.innerHTML=Object.keys(db).map(c=>`<option value="${c}"${c===currentClass?' selected':''}>${c}</option>`).join('');
+function addClassMob(){
+  const n=document.getElementById('mNewClsInp').value.trim();
+  if(!n||db[n])return;
+  db[n]={students:[],lessonCount:1};cc=n;
+  document.getElementById('mNewClsInp').value='';
+  save();renderClassSels();render();
 }
+function switchClass(){cc=document.getElementById('classSel').value;save();render();}
+function switchClassMob(){cc=document.getElementById('mClassSel').value;save();render();}
+function renderClassSels(){
+  const opts=Object.keys(db).map(c=>`<option value="${c}"${c===cc?' selected':''}>${c}</option>`).join('');
+  document.getElementById('classSel').innerHTML=opts;
+  document.getElementById('mClassSel').innerHTML=opts;
+}
+
+// ── STUDENTS ──────────────────────────────────────────
 function addStudent(){
-  const n=document.getElementById('newStudentName').value.trim();
+  const n=document.getElementById('newStudInp').value.trim();
   if(!n)return;
-  db[currentClass].students.push(makeStudent(n));
-  document.getElementById('newStudentName').value='';
+  db[cc].students.push(mkS(n));
+  document.getElementById('newStudInp').value='';
+  save();render();
+}
+function addStudentMob(){
+  const n=document.getElementById('mNewStudInp').value.trim();
+  if(!n)return;
+  db[cc].students.push(mkS(n));
+  document.getElementById('mNewStudInp').value='';
   save();render();
 }
 function removeStudent(id){
   if(!confirm('Видалити учня?'))return;
-  db[currentClass].students=db[currentClass].students.filter(s=>s.id!==id);
+  db[cc].students=db[cc].students.filter(s=>s.id!==id);
   save();render();
 }
 function clearGrades(){
   if(!confirm('Очистити всі результати?'))return;
-  db[currentClass].students.forEach(s=>{s.visits=[null,null,null,null];s.visitDates=[null,null,null,null];s.status=null;});
+  db[cc].students.forEach(s=>{s.visits=[null,null,null,null];s.visitDates=[null,null,null,null];s.status=null;});
   save();render();
 }
-function getStudent(id){return db[currentClass].students.find(x=>x.id===id);}
 
-function onVisitInput(id,vi,val){
-  const s=getStudent(id);if(!s)return;
-  const num=parseInt(val);
-  if(val===''||isNaN(num)){s.visits[vi]=null;s.visitDates[vi]=null;}
-  else{s.visits[vi]=Math.max(0,Math.min(100,num));if(!s.visitDates[vi])s.visitDates[vi]=todayISO();}
-  save();updateRow(s);renderSummary();renderExport();
+// ── VISITS ────────────────────────────────────────────
+function onVI(id,vi,val){
+  const s=gS(id);if(!s)return;
+  const n=parseInt(val);
+  if(val===''||isNaN(n)){s.visits[vi]=null;s.visitDates[vi]=null;}
+  else{s.visits[vi]=Math.max(0,Math.min(100,n));if(!s.visitDates[vi])s.visitDates[vi]=todayISO();}
+  save();updateRow(id);renderSummary();renderExport();
 }
-function toggleStatus(id,status){
-  const s=getStudent(id);if(!s)return;
-  s.status=s.status===status?null:status;save();updateRow(s);
+function toggleStatus(id,st){
+  const s=gS(id);if(!s)return;
+  s.status=s.status===st?null:st;save();updateRow(id);
 }
 
+// ── COMMENT ───────────────────────────────────────────
 function openComment(id){
-  const s=getStudent(id);commentTarget=id;
-  document.getElementById('commentModalTitle').textContent='Коментар: '+s.name;
-  document.getElementById('commentText').value=s.comment||'';
-  document.getElementById('commentModal').classList.add('open');
-  setTimeout(()=>document.getElementById('commentText').focus(),100);
+  const s=gS(id);cTarget=id;
+  document.getElementById('commentTitle').textContent='// '+s.name;
+  document.getElementById('commentTa').value=s.comment||'';
+  document.getElementById('commentOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('commentTa').focus(),120);
 }
-function closeCommentModal(e){
-  if(e&&e.target!==document.getElementById('commentModal'))return;
-  document.getElementById('commentModal').classList.remove('open');commentTarget=null;
+function closeComment(e){
+  if(e&&e.target!==document.getElementById('commentOverlay'))return;
+  document.getElementById('commentOverlay').classList.remove('open');cTarget=null;
 }
 function saveComment(){
-  const s=getStudent(commentTarget);
-  if(s){s.comment=document.getElementById('commentText').value.trim();save();updateRow(s);}
-  document.getElementById('commentModal').classList.remove('open');commentTarget=null;
+  const s=gS(cTarget);if(s){s.comment=document.getElementById('commentTa').value.trim();save();updateRow(s.id);}
+  document.getElementById('commentOverlay').classList.remove('open');cTarget=null;
 }
 function clearComment(){
-  const s=getStudent(commentTarget);
-  if(s){s.comment='';save();updateRow(s);}
-  document.getElementById('commentModal').classList.remove('open');commentTarget=null;
+  const s=gS(cTarget);if(s){s.comment='';save();updateRow(s.id);}
+  document.getElementById('commentOverlay').classList.remove('open');cTarget=null;
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('commentModal').classList.remove('open');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('commentOverlay').classList.remove('open');});
 
-let pickSpinInterval=null;
+// ── PICKER ────────────────────────────────────────────
+let spinIv=null;
+function setPMode(m){
+  pickerMode=m;
+  ['never','all'].forEach(k=>{
+    document.getElementById('pm-'+k)?.classList.toggle('on',k===m);
+    document.getElementById('mpm-'+k)?.classList.toggle('on',k===m);
+  });
+}
 function pickRandom(){
-  const mode=document.querySelector('input[name="pickerMode"]:checked').value;
-  const students=db[currentClass].students.filter(s=>s.status!=='absent');
-  let pool=mode==='never'?students.filter(s=>s.visits.every(v=>v===null)&&s.status!=='notready'):students;
+  const act=db[cc].students.filter(s=>s.status!=='absent');
+  let pool=pickerMode==='never'?act.filter(s=>s.visits.every(v=>v===null)&&s.status!=='notready'):act;
+  const rEl=document.getElementById('pickerResult'),mREl=document.getElementById('mPickerResult');
+  const sEl=document.getElementById('pickerSub'),mSEl=document.getElementById('mPickerSub');
   if(!pool.length){
-    document.getElementById('pickerName').textContent='Немає кандидатів';
-    document.getElementById('pickerHint').textContent=mode==='never'?'Усі вже виходили!':'';return;
+    [rEl,mREl].forEach(el=>{if(el)el.textContent='немає кандидатів';});
+    [sEl,mSEl].forEach(el=>{if(el)el.textContent=pickerMode==='never'?'// усі вже виходили':'';});
+    return;
   }
-  const el=document.getElementById('pickerName'),hint=document.getElementById('pickerHint');
-  el.classList.add('spinning');
-  let count=0;
-  if(pickSpinInterval)clearInterval(pickSpinInterval);
-  pickSpinInterval=setInterval(()=>{
-    el.textContent=pool[Math.floor(Math.random()*pool.length)].name;count++;
-    if(count>14){
-      clearInterval(pickSpinInterval);
-      const chosen=pool[Math.floor(Math.random()*pool.length)];
-      el.textContent=chosen.name;el.classList.remove('spinning');
-      hint.textContent=`#${db[currentClass].students.indexOf(chosen)+1} · виходів: ${chosen.visits.filter(v=>v!==null).length}`;
-      document.getElementById('timerStudentName').textContent=chosen.name;
-      document.getElementById('timerStatus').textContent='Готово — запустіть таймер';
-      timerStudentNameVal=chosen.name;
+  [rEl,mREl].forEach(el=>{if(el)el.classList.add('spin');});
+  let cnt=0;if(spinIv)clearInterval(spinIv);
+  spinIv=setInterval(()=>{
+    const r=pool[Math.floor(Math.random()*pool.length)];
+    [rEl,mREl].forEach(el=>{if(el)el.textContent=r.name;});
+    if(++cnt>14){
+      clearInterval(spinIv);
+      const ch=pool[Math.floor(Math.random()*pool.length)];
+      [rEl,mREl].forEach(el=>{if(el){el.textContent=ch.name;el.classList.remove('spin');}});
+      const sub=`#${db[cc].students.indexOf(ch)+1} · виходів: ${ch.visits.filter(v=>v!==null).length}`;
+      [sEl,mSEl].forEach(el=>{if(el)el.textContent=sub;});
+      ['timerWho','mTimerWho'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ch.name;});
+      ['timerHint','mTimerHint'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='готово — запустіть таймер';});
+      timerName=ch.name;
     }
   },80);
 }
 
-let timerRunning=false,timerSeconds=0,timerInterval=null,timerStudentNameVal='';
+// ── TIMER ─────────────────────────────────────────────
+let tRun=false,tSec=0,tIv=null,timerName='';
 function toggleTimer(){
-  if(timerRunning){
-    clearInterval(timerInterval);timerRunning=false;
-    document.getElementById('timerStartBtn').textContent='Старт';
-    document.getElementById('timerStatus').textContent=`Зупинено на ${formatTime(timerSeconds)}`;
-  }else{
-    timerRunning=true;document.getElementById('timerStartBtn').textContent='Стоп';
-    document.getElementById('timerStatus').textContent='Іде час…';
-    timerInterval=setInterval(()=>{timerSeconds++;updateTimerDisplay();},1000);
+  if(tRun){
+    clearInterval(tIv);tRun=false;
+    ['timerBtn','mTimerBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='старт';});
+    ['timerHint','mTimerHint'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=`зупинено на ${fmtT(tSec)}`;});
+  } else {
+    tRun=true;
+    ['timerBtn','mTimerBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='стоп';});
+    ['timerHint','mTimerHint'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='іде час…';});
+    tIv=setInterval(()=>{tSec++;updTimer();},1000);
   }
 }
 function resetTimer(){
-  clearInterval(timerInterval);timerRunning=false;timerSeconds=0;
-  document.getElementById('timerStartBtn').textContent='Старт';
-  document.getElementById('timerStatus').textContent='Оберіть учня і запустіть таймер';
-  updateTimerDisplay();
+  clearInterval(tIv);tRun=false;tSec=0;
+  ['timerBtn','mTimerBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='старт';});
+  ['timerHint','mTimerHint'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='оберіть учня';});
+  updTimer();
 }
-function updateTimerDisplay(){
-  const el=document.getElementById('timerDisplay');
-  el.textContent=formatTime(timerSeconds);
-  el.className='timer-display'+(timerSeconds>300?' overtime':timerRunning?' running':'');
+function updTimer(){
+  const cls='timer-digits'+(tSec>300?' over':tRun?' run':'');
+  const txt=fmtT(tSec);
+  ['timerDig','mTimerDig'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=txt;el.className=cls;}});
 }
-function formatTime(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+const fmtT=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 
+// ── RENDER ────────────────────────────────────────────
 function render(){
-  document.getElementById('topTitle').textContent=currentClass;
-  document.getElementById('todayDate').textContent=todayStr();
-  document.getElementById('lessonBadge').textContent='Урок '+(db[currentClass].lessonCount||1);
-  renderClassSelect();renderTable();renderSummary();renderExport();
-}
-
-function renderTable(){
-  const tbody=document.getElementById('tbody');tbody.innerHTML='';
-  db[currentClass].students.forEach((s,idx)=>tbody.appendChild(buildRow(s,idx)));
+  document.getElementById('topClass').textContent=cc;
+  document.getElementById('topDate').textContent=todayStr();
+  renderClassSels();
+  renderTable('tbody');
+  renderTable('mtbody');
+  renderSummary();
+  renderExport();
 }
 
 function buildRow(s,idx){
-  const tr=document.createElement('tr');tr.id='row_'+s.id;
-  const filled=s.visits.filter(v=>v!==null);
-  const avg=filled.length?Math.round(filled.reduce((a,b)=>a+b,0)/filled.length):null;
-  const grade=avg!==null?pctToGrade(avg):null;
-  const gc=gradeStyle(grade);
-  const absent=s.status==='absent',notready=s.status==='notready';
-  const dis=(absent||notready)?' disabled':'';
+  const f=s.visits.filter(v=>v!==null);
+  const avg=f.length?Math.round(f.reduce((a,b)=>a+b,0)/f.length):null;
+  const g=avg!==null?p2g(avg):null;
+  const ab=s.status==='absent',nr=s.status==='notready';
+  const dis=ab||nr?' disabled':'';
 
-  const visitCols=[0,1,2,3].map(i=>{
-    const val=s.visits[i]!==null?s.visits[i]:'';
-    const fc=s.visits[i]!==null?' filled':'';
-    const date=s.visitDates&&s.visitDates[i]?new Date(s.visitDates[i]).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'}):'';
-    return `<td><div class="visit-wrap">
-      <input type="number" min="0" max="100" step="1" class="visit-input${fc}" id="v_${s.id}_${i}" value="${val}" placeholder="%" oninput="onVisitInput(${s.id},${i},this.value)"${dis}>
-      ${date?`<div class="visit-date">${date}</div>`:''}
+  const vCols=[0,1,2,3].map(i=>{
+    const v=s.visits[i]!==null?s.visits[i]:'';
+    const ok=s.visits[i]!==null?' ok':'';
+    const dt=s.visitDates?.[i]?new Date(s.visitDates[i]).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'}):'';
+    return `<td><div class="vc">
+      <input type="number" min="0" max="100" step="1" class="vi${ok}" id="v_${s.id}_${i}" value="${v}" placeholder="%" oninput="onVI(${s.id},${i},this.value)"${dis}>
+      ${dt?`<div class="vdate">${dt}</div>`:''}
     </div></td>`;
   }).join('');
 
-  tr.innerHTML=`
-    <td class="num-cell">${idx+1}</td>
-    <td>
-      <div class="name-cell${absent?' name-missing':''}">${s.name}</div>
-      <div class="status-btns">
-        <button class="status-btn${absent?' active-absent':''}" onclick="toggleStatus(${s.id},'absent')">відс.</button>
-        <button class="status-btn${notready?' active-notready':''}" onclick="toggleStatus(${s.id},'notready')">не гот.</button>
+  return `<tr id="row_${s.id}">
+    <td class="nc">${idx+1}</td>
+    <td><div class="name-wrap">
+      <div class="name-text${ab?' name-absent':''}">${s.name}</div>
+      <div class="status-row">
+        <button class="stbtn${ab?' absent':''}" onclick="toggleStatus(${s.id},'absent')">відс</button>
+        <button class="stbtn${nr?' notready':''}" onclick="toggleStatus(${s.id},'notready')">не гот</button>
       </div>
-    </td>
-    ${visitCols}
-    <td class="avg-cell" id="avg_${s.id}">${avg!==null?avg+'%':'—'}</td>
-    <td><span class="grade-badge ${gc}" id="grade_${s.id}">${grade!==null?grade:'—'}</span></td>
-    <td><button class="comment-btn${s.comment?' has-comment':''}" onclick="openComment(${s.id})" title="${s.comment||'Додати коментар'}">${s.comment?'💬':'○'}</button></td>
-    <td><button class="remove-btn" onclick="removeStudent(${s.id})">×</button></td>
-  `;
-  return tr;
+    </div></td>
+    ${vCols}
+    <td class="avg-td" id="avg_${s.id}">${avg!==null?avg+'%':'—'}</td>
+    <td><span class="gb ${gCls(g)}" id="gb_${s.id}">${g!==null?g:'—'}</span></td>
+    <td><button class="cbtn${s.comment?' hc':''}" onclick="openComment(${s.id})">${s.comment?'💬':'·'}</button></td>
+    <td><button class="rbtn" onclick="removeStudent(${s.id})">×</button></td>
+  </tr>`;
 }
 
-function updateRow(s){
-  const old=document.getElementById('row_'+s.id);if(!old)return;
-  old.replaceWith(buildRow(s,db[currentClass].students.indexOf(s)));
+function renderTable(tbodyId){
+  const tb=document.getElementById(tbodyId);if(!tb)return;
+  tb.innerHTML=db[cc].students.map((s,i)=>buildRow(s,i)).join('');
+}
+
+function updateRow(id){
+  const s=gS(id);if(!s)return;
+  const idx=db[cc].students.indexOf(s);
+  ['row_'].forEach(pfx=>{
+    const el=document.getElementById(pfx+id);
+    if(el)el.outerHTML=buildRow(s,idx);
+  });
+  // update both tables
+  renderTable('tbody');
+  renderTable('mtbody');
+  renderSummary();
+  renderExport();
 }
 
 function renderSummary(){
-  const students=db[currentClass].students;
-  const active=students.filter(s=>s.status!=='absent');
-  const graded=active.filter(s=>s.visits.some(v=>v!==null));
-  const grades=graded.map(s=>{const f=s.visits.filter(v=>v!==null);return pctToGrade(Math.round(f.reduce((a,b)=>a+b,0)/f.length));});
-  const avgGrade=grades.length?(grades.reduce((a,b)=>a+b,0)/grades.length).toFixed(1):'—';
-  const quality=grades.length?Math.round(grades.filter(g=>g>=7).length/grades.length*100)+'%':'—';
-  const todayVisits=students.reduce((acc,s)=>acc+s.visitDates.filter(d=>d===todayISO()).length,0);
-  const neverOut=active.filter(s=>s.visits.every(v=>v===null)&&s.status!=='notready').length;
-  document.getElementById('st-total').textContent=students.length;
-  document.getElementById('st-graded').textContent=graded.length;
-  document.getElementById('st-avg').textContent=avgGrade;
-  document.getElementById('st-quality').textContent=quality;
-  document.getElementById('ss-total').textContent=students.length;
-  document.getElementById('ss-today').textContent=todayVisits;
-  document.getElementById('ss-graded').textContent=graded.length;
-  document.getElementById('ss-avg').textContent=avgGrade;
-  document.getElementById('ss-quality').textContent=quality;
-  document.getElementById('ss-never').textContent=neverOut;
+  const sts=db[cc].students;
+  const act=sts.filter(s=>s.status!=='absent');
+  const gr=act.filter(s=>s.visits.some(v=>v!==null));
+  const gs=gr.map(s=>{const f=s.visits.filter(v=>v!==null);return p2g(Math.round(f.reduce((a,b)=>a+b,0)/f.length));});
+  const avg=gs.length?(gs.reduce((a,b)=>a+b,0)/gs.length).toFixed(1):'—';
+  const qual=gs.length?Math.round(gs.filter(g=>g>=7).length/gs.length*100)+'%':'—';
+  const tod=sts.reduce((a,s)=>a+s.visitDates.filter(d=>d===todayISO()).length,0);
+  const nev=act.filter(s=>s.visits.every(v=>v===null)&&s.status!=='notready').length;
+
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('sc-total',sts.length); set('sc-graded',gr.length); set('sc-avg',avg); set('sc-quality',qual);
+  set('sb-total',sts.length); set('sb-today',tod); set('sb-graded',gr.length); set('sb-avg',avg); set('sb-quality',qual); set('sb-never',nev);
+  set('msc-total',sts.length); set('msc-graded',gr.length); set('msc-avg',avg); set('msc-quality',qual);
+  set('mSb-total',sts.length); set('mSb-today',tod); set('mSb-graded',gr.length); set('mSb-avg',avg); set('mSb-quality',qual); set('mSb-never',nev);
 }
 
 function renderExport(){
-  const students=db[currentClass].students;
-  const graded=students.filter(s=>s.visits.some(v=>v!==null));
-  const sec=document.getElementById('exportSection');
-  if(!graded.length){sec.style.display='none';return;}
-  sec.style.display='block';
-  const lines=graded.map(s=>{
+  const gr=db[cc].students.filter(s=>s.visits.some(v=>v!==null));
+  ['exportBox','mExportBox'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=gr.length?'block':'none';});
+  if(!gr.length)return;
+  const lines=gr.map(s=>{
     const f=s.visits.filter(v=>v!==null);
     const avg=Math.round(f.reduce((a,b)=>a+b,0)/f.length);
     const dates=s.visitDates.filter(Boolean).map(d=>new Date(d).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'}));
-    return `${s.name.padEnd(26)}${avg}%  →  ${pctToGrade(avg)}${dates.length?'  ['+dates.join(', ')+']':''}`;
-  });
-  document.getElementById('exportPre').textContent=lines.join('\n');
+    return `${s.name.padEnd(26)}${avg}%  →  ${p2g(avg)}${dates.length?'  ['+dates.join(', ')+']':''}`;
+  }).join('\n');
+  ['exportPre','mExportPre'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=lines;});
 }
 
-function copyExport(){
-  navigator.clipboard.writeText(document.getElementById('exportPre').textContent).then(()=>{
-    const btn=event.target;btn.textContent='Скопійовано!';
-    setTimeout(()=>btn.textContent='Скопіювати',1500);
-  });
-}
+function copyExport(){navigator.clipboard.writeText(document.getElementById('exportPre').textContent).then(()=>{const b=event.target;b.textContent='copied!';setTimeout(()=>b.textContent='copy',1500);});}
+function copyExportMob(){navigator.clipboard.writeText(document.getElementById('mExportPre').textContent).then(()=>{const b=event.target;b.textContent='copied!';setTimeout(()=>b.textContent='copy',1500);});}
 
 function exportCSV(){
-  const students=db[currentClass].students;
-  const rows=[['#',"Прізвище Ім'я",'Вихід 1','Дата 1','Вихід 2','Дата 2','Вихід 3','Дата 3','Вихід 4','Дата 4','Середній %','Оцінка','Коментар']];
-  students.forEach((s,idx)=>{
+  const sts=db[cc].students;
+  const rows=[['#',"Прізвище Ім'я",'В1','Дата1','В2','Дата2','В3','Дата3','В4','Дата4','Сер%','Оцінка','Коментар']];
+  sts.forEach((s,i)=>{
     const f=s.visits.filter(v=>v!==null);
     const avg=f.length?Math.round(f.reduce((a,b)=>a+b,0)/f.length):'';
-    const g=avg!==''?pctToGrade(avg):'';
-    const row=[idx+1,s.name];
-    for(let i=0;i<4;i++){row.push(s.visits[i]!==null?s.visits[i]:'');row.push(s.visitDates[i]?new Date(s.visitDates[i]).toLocaleDateString('uk-UA'):'');}
-    row.push(avg,g,s.comment||'');rows.push(row);
+    const row=[i+1,s.name];
+    for(let j=0;j<4;j++){row.push(s.visits[j]??'');row.push(s.visitDates[j]?new Date(s.visitDates[j]).toLocaleDateString('uk-UA'):'');}
+    row.push(avg,avg!==''?p2g(avg):'',s.comment||'');rows.push(row);
   });
   const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
-  a.download=`${currentClass}_дошка_${todayISO()}.csv`;a.click();
+  a.download=`${cc}_${todayISO()}.csv`;a.click();
 }
 
-document.getElementById('newStudentName').addEventListener('keydown',e=>{if(e.key==='Enter')addStudent();});
-document.getElementById('newClassName').addEventListener('keydown',e=>{if(e.key==='Enter')addClass();});
-document.getElementById('todayDate').textContent=todayStr();
+['newStudInp'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')addStudent();});
+});
+document.getElementById('mNewStudInp')?.addEventListener('keydown',e=>{if(e.key==='Enter')addStudentMob();});
+document.getElementById('newClsInp')?.addEventListener('keydown',e=>{if(e.key==='Enter')addClass();});
 
-if(sessionStorage.getItem(SESSION_KEY)){load();render();}
+// ── THEME ─────────────────────────────────────────────
+const THEME_KEY='boardTracker_theme';
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t==='dark'?'':t);
+  localStorage.setItem(THEME_KEY,t);
+  ['dark','light','mix'].forEach(k=>{
+    document.getElementById('tt-'+k)?.classList.toggle('on',k===t);
+    document.getElementById('mtt-'+k)?.classList.toggle('on',k===t);
+  });
+}
+(function(){const t=localStorage.getItem(THEME_KEY)||'dark';setTheme(t);})();
+
+// ── RENAME CLASS ──────────────────────────────────────
+function renameClass(){
+  const cur=cc;
+  const nw=prompt('Нова назва класу:',cur);
+  if(!nw||nw===cur||db[nw])return;
+  db[nw]=db[cur];delete db[cur];cc=nw;
+  save();renderClassSels();render();
+}
+
+if(sessionStorage.getItem(SK)){load();render();}
 </script>
 </body>
 </html>
