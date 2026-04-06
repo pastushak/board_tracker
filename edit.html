@@ -82,7 +82,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .tt-btn:not(.on):hover{color:var(--text2);}
 
 .body-wrap{display:flex;flex:1;overflow:hidden;}
-.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;position:sticky;top:48px;height:calc(100vh - 48px);}
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
 
 .sb-section{padding:14px 14px 8px;}
@@ -431,8 +431,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 <script>
 // ╔═══════════════════════════════╗
 // ║  ЗМІНИТИ ПАРОЛЬ ТУТ           ║
-const AUTH_PIN  = 'zaqxswcde';
-const AUTH_PASS = 'tracker6a';
+const AUTH_PIN  = '1234';
+const AUTH_PASS = 'math2026';
 // ╚═══════════════════════════════╝
 
 // ── SUPABASE CONFIG ───────────────────────────────────
