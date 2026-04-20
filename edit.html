@@ -269,7 +269,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
       <div class="picker-box">
         <div class="sb-label">Хто до дошки?</div>
         <div class="picker-modes">
-          <button class="pmode on" id="pm-never" onclick="setPMode('never')">не виходили</button>
+          <button class="pmode on" id="pm-fewest" onclick="setPMode('fewest')">найменше</button>
+          <button class="pmode" id="pm-free" onclick="setPMode('free')">є місця</button>
           <button class="pmode" id="pm-all" onclick="setPMode('all')">усі</button>
         </div>
         <button class="btn btn-accent btn-full" onclick="pickRandom()">▶ Вибрати учня</button>
@@ -357,7 +358,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
         <div style="padding:16px">
           <div class="sb-label" style="margin-bottom:10px">Хто до дошки?</div>
           <div class="picker-modes" style="margin-bottom:12px">
-            <button class="pmode on" id="mpm-never" onclick="setPMode('never')">не виходили</button>
+            <button class="pmode on" id="mpm-fewest" onclick="setPMode('fewest')">найменше</button>
+            <button class="pmode" id="mpm-free" onclick="setPMode('free')">є місця</button>
             <button class="pmode" id="mpm-all" onclick="setPMode('all')">усі</button>
           </div>
           <button class="btn btn-accent btn-full" style="margin-bottom:16px" onclick="pickRandom()">▶ Вибрати учня</button>
@@ -430,11 +432,15 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 
 <script src="config.js"></script>
 <script>
-// ── CONFIG (з config.js) ──────────────────────────────
-const AUTH_PIN  = CONFIG.AUTH_PIN;
-const AUTH_PASS = CONFIG.AUTH_PASS;
-const SB_URL    = CONFIG.SB_URL;
-const SB_KEY    = CONFIG.SB_KEY;
+// ╔═══════════════════════════════╗
+// ║  ЗМІНИТИ ПАРОЛЬ ТУТ           ║
+const AUTH_PIN  = '1234';
+const AUTH_PASS = 'math2026';
+// ╚═══════════════════════════════╝
+
+// ── SUPABASE CONFIG ───────────────────────────────────
+const SB_URL = 'https://vpolpecaqnovouvyzfha.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwb2xwZWNhcW5vdm91dnl6ZmhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NDU0NzAsImV4cCI6MjA5MTAyMTQ3MH0.84ZV6SILes6hzAZZzYUQXxakJzEfSfmMRfc0rSBKz74';
 
 const sbFetch = async (path, opts={}) => {
   const res = await fetch(SB_URL + '/rest/v1/' + path, {
@@ -471,7 +477,7 @@ const ROSTER = [
   'Федорак Злата','Федорак Кароліна','Шкляр Артур'
 ];
 
-let idc=0, classes={}, cc='6-А', cTarget=null, pickerMode='never', saveTimeout=null;
+let idc=0, classes={}, cc='6-А', cTarget=null, pickerMode='fewest', saveTimeout=null;
 
 const GS=[[90,12],[83,11],[75,10],[67,9],[59,8],[50,7],[42,6],[34,5],[26,4],[17,3],[8,2],[0,1]];
 const p2g=p=>{for(const[m,g]of GS)if(p>=m)return g;return 1;};
@@ -668,19 +674,34 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementB
 let spinIv=null;
 function setPMode(m){
   pickerMode=m;
-  ['never','all'].forEach(k=>{
+  ['fewest','free','all'].forEach(k=>{
     document.getElementById('pm-'+k)?.classList.toggle('on',k===m);
     document.getElementById('mpm-'+k)?.classList.toggle('on',k===m);
   });
 }
+
+function buildPool(){
+  const act=(classes[cc]?.students||[]).filter(s=>s.status!=='absent'&&s.status!=='notready');
+  if(pickerMode==='all'){
+    return (classes[cc]?.students||[]).filter(s=>s.status!=='absent');
+  }
+  if(pickerMode==='free'){
+    // учні у кого ще є незаповнені поля (менше 4 виходів)
+    return act.filter(s=>s.visits.some(v=>v===null));
+  }
+  // 'fewest' — обирає з тих хто виходив найменше разів
+  const counts=act.map(s=>s.visits.filter(v=>v!==null).length);
+  const minCount=Math.min(...counts);
+  return act.filter(s=>s.visits.filter(v=>v!==null).length===minCount);
+}
+
 function pickRandom(){
-  const act=(classes[cc]?.students||[]).filter(s=>s.status!=='absent');
-  let pool=pickerMode==='never'?act.filter(s=>s.visits.every(v=>v===null)&&s.status!=='notready'):act;
+  const pool=buildPool();
   const rEl=document.getElementById('pickerResult'),mREl=document.getElementById('mPickerResult');
   const sEl=document.getElementById('pickerSub'),mSEl=document.getElementById('mPickerSub');
   if(!pool.length){
     [rEl,mREl].forEach(el=>{if(el)el.textContent='немає кандидатів';});
-    [sEl,mSEl].forEach(el=>{if(el)el.textContent=pickerMode==='never'?'// усі вже виходили':'';});return;
+    [sEl,mSEl].forEach(el=>{if(el)el.textContent='// всі відсутні або не готові';});return;
   }
   [rEl,mREl].forEach(el=>{if(el)el.classList.add('spin');});
   let cnt=0;if(spinIv)clearInterval(spinIv);
@@ -691,8 +712,12 @@ function pickRandom(){
       clearInterval(spinIv);
       const ch=pool[Math.floor(Math.random()*pool.length)];
       [rEl,mREl].forEach(el=>{if(el){el.textContent=ch.name;el.classList.remove('spin');}});
-      const sub=`#${classes[cc].students.indexOf(ch)+1} · виходів: ${ch.visits.filter(v=>v!==null).length}`;
-      [sEl,mSEl].forEach(el=>{if(el)el.textContent=sub;});
+      const visitCount=ch.visits.filter(v=>v!==null).length;
+      const poolSize=pool.length;
+      const hint=pickerMode==='fewest'?`коло ${visitCount+1} · пул: ${poolSize} учнів`:
+                 pickerMode==='free'?`виходів: ${visitCount} з 4`:
+                 `виходів: ${visitCount}`;
+      [sEl,mSEl].forEach(el=>{if(el)el.textContent=hint;});
       ['timerWho','mTimerWho'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ch.name;});
       ['timerHint','mTimerHint'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='готово — запустіть таймер';});
     }
