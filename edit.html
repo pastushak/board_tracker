@@ -428,16 +428,13 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
   </div>
 </div>
 
+<script src="config.js"></script>
 <script>
-// ╔═══════════════════════════════╗
-// ║  ЗМІНИТИ ПАРОЛЬ ТУТ           ║
-const AUTH_PIN  = '1234';
-const AUTH_PASS = 'math2026';
-// ╚═══════════════════════════════╝
-
-// ── SUPABASE CONFIG ───────────────────────────────────
-const SB_URL = 'https://vpolpecaqnovouvyzfha.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwb2xwZWNhcW5vdm91dnl6ZmhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NDU0NzAsImV4cCI6MjA5MTAyMTQ3MH0.84ZV6SILes6hzAZZzYUQXxakJzEfSfmMRfc0rSBKz74';
+// ── CONFIG (з config.js) ──────────────────────────────
+const AUTH_PIN  = CONFIG.AUTH_PIN;
+const AUTH_PASS = CONFIG.AUTH_PASS;
+const SB_URL    = CONFIG.SB_URL;
+const SB_KEY    = CONFIG.SB_KEY;
 
 const sbFetch = async (path, opts={}) => {
   const res = await fetch(SB_URL + '/rest/v1/' + path, {
