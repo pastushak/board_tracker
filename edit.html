@@ -431,8 +431,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 <script>
 // ╔═══════════════════════════════╗
 // ║  ЗМІНИТИ ПАРОЛЬ ТУТ           ║
-const AUTH_PIN  = '159263487';
-const AUTH_PASS = 'zaqxswcde';
+const AUTH_PIN  = '1234';
+const AUTH_PASS = 'math2026';
 // ╚═══════════════════════════════╝
 
 // ── SUPABASE CONFIG ───────────────────────────────────
@@ -629,6 +629,10 @@ function clearGrades(){
 }
 
 // ── VISITS ────────────────────────────────────────────
+function previewVI(el){
+  const v=parseInt(el.value);
+  el.classList.toggle('ok', !isNaN(v) && el.value!=='');
+}
 function onVI(id,vi,val){
   const s=gS(id);if(!s)return;
   const n=parseInt(val);
@@ -742,7 +746,7 @@ function buildRow(s,idx){
     const ok=s.visits[i]!==null?' ok':'';
     const dt=s.visitDates?.[i]?new Date(s.visitDates[i]).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'}):'';
     return`<td><div class="vc">
-      <input type="number" min="0" max="100" step="1" class="vi${ok}" value="${v}" placeholder="%" oninput="onVI(${s.id},${i},this.value)"${dis}>
+      <input type="number" min="0" max="100" step="1" class="vi${ok}" value="${v}" placeholder="%" onchange="onVI(${s.id},${i},this.value)" oninput="previewVI(this)"${dis}>
       ${dt?`<div class="vdate">${dt}</div>`:''}
     </div></td>`;
   }).join('');
